@@ -10,8 +10,8 @@ using namespace std;
 class ProtoGame {
 	SDL_Window *win;
 	SDL_bool loopShouldStop;
-	int w,h;  //  Dimension of screen space
 	protected:
+	int w,h;  //  Dimension of screen space
 	SDL_Renderer *renderer;
 	public:
 	ProtoGame(string name,int newWidth=640,int newHeight=480,int seed=0) {
@@ -60,29 +60,79 @@ class ProtoGame {
 	}
 };
 
-class Player {
+class Sprite { // Just draw no physics or keyboard
 	SDL_Renderer *renderer;
-	SDL_Texture *player;
+	SDL_Texture *image;
 	SDL_Rect SrcR,DestR;
-	double px,py,vx,vy,ax,ay;
+	protected:
+	double px,py;
 	public:
-	Player(SDL_Renderer *newRenderer,
-	   double newPx=0.0,double newPy=0.0,
-	   double newVx=0.0,double newVy=0.0,
-	   double newAx=0.0,double newAy=0.0) {
+	Sprite(SDL_Renderer *newRenderer,string filename,double newPx=0.0,double newPy=0.0) {
 		renderer=newRenderer;
-		player=NULL;
+		image=NULL;
 		SDL_Surface *bitmapSurface = NULL;
-		bitmapSurface = SDL_LoadBMP("img/player.bmp");
+		bitmapSurface = SDL_LoadBMP(filename.c_str());
 		SrcR.x = 0;
 		SrcR.y = 0;
 		SrcR.w = bitmapSurface->w;
 		SrcR.h = bitmapSurface->h;
 		DestR=SrcR;
-		player = SDL_CreateTextureFromSurface(renderer, bitmapSurface);		
+		image = SDL_CreateTextureFromSurface(renderer, bitmapSurface);		
 		SDL_FreeSurface(bitmapSurface);
 		px=newPx;
 		py=newPy;
+	}
+	virtual void handleEvent(SDL_Event &e) {} 
+	virtual void loop(int millis) {
+        DestR.x=(int)px; 
+        DestR.y=(int)py;            
+        SDL_RenderCopy(renderer, image, &SrcR, &DestR);
+	}
+	virtual ~Sprite() {
+		SDL_DestroyTexture(image);
+	}
+};
+
+class Player:public Sprite { // keyboard makes you move around
+	int minX,maxX,minY,maxY;
+	public:
+	Player(SDL_Renderer *newRenderer,string filename,
+	  double newPx=0.0,double newPy=0.0):Sprite(newRenderer,filename,newPx,newPy) {
+		  minX=-1;
+		  maxX=-1;
+		  minY=-1;
+		  maxY=-1;
+	}
+	void setBounds(int newMinX,int newMaxX,int newMinY,int newMaxY) {
+		minX=newMinX;
+		maxX=newMaxX;
+		minY=newMinY;
+		maxY=newMaxY;
+	}
+	void handleEvent(const SDL_Event &e) {
+		// is the event a A keypress
+		if (e.type==SDL_KEYDOWN) {
+		   if (e.key.keysym.sym==SDLK_a) px--;
+		   if (e.key.keysym.sym==SDLK_w) py--;
+		   if (e.key.keysym.sym==SDLK_s) py++;
+		   if (e.key.keysym.sym==SDLK_d) px++;	    
+		}
+		if (px<minX && minX!=-1) px=0;
+		if (px>maxX && maxX!=-1) px=640;
+		if (py<minY && minY!=-1) py=0;
+		if (py>maxY && maxY!=-1) py=480;
+	}
+	~Player() {
+	}
+};
+
+class Particle:public Sprite{  // Physics is ok
+	double vx,vy,ax,ay;
+	public:
+	Particle(SDL_Renderer *newRenderer,string filename,
+	  double newPx=0.0,double newPy=0.0,
+	  double newVx=0.0,double newVy=0.0,
+	  double newAx=0.0,double newAy=0.0):Sprite(newRenderer,filename,newPx,newPy){
 		vx=newVx;
 		vy=newVy;
 		ax=newAx;
@@ -96,46 +146,45 @@ class Player {
         vy+=ay*dt;
         if (px>=640 || px<0) vx=-vx;
         if (py>=480 || py<0) vy=-vy;
-        DestR.x=(int)px; 
-        DestR.y=(int)py;            
-        SDL_RenderCopy(renderer, player, &SrcR, &DestR);
+        Sprite::loop(millis);
 	}
-	~Player() {
-		SDL_DestroyTexture(player);
+	~Particle() {
 	}
 };
 
 class Game:public ProtoGame {
-	SDL_Texture *background;
-	vector<Player *> players;
+	vector<Sprite *> sprites;
+	Player *p;
+	Sprite *background;
 	public:
-	Game():ProtoGame("Karls Supercool Game",640,480,10){  // Size,Seed
-		background = NULL;
-		SDL_Surface *bitmapSurface = NULL;
-		bitmapSurface = SDL_LoadBMP("img/hello.bmp");
-		background = SDL_CreateTextureFromSurface(renderer, bitmapSurface);
+	Game():ProtoGame("Space Farm Game",640,480,10){  // Size,Seed
+		background = new Sprite(renderer, "img/hello.bmp");
+		sprites.push_back(background);
+		double sx=getW()/2.0;
+		double sy=getH()/2.0;
 		for (int i=0;i<100;i++) { //  Initialize Level loop
-		  double x=getW()*(double)(rand()%1000)/1000.0;
-		  double y=getH()*(double)(rand()%1000)/1000.0;
-		  double vx=0.0;
-		  double vy=0.0;
+		  double x=sx;
+		  double y=sy;
+		  double vx=100.0*(1.0-(double)(rand()%2000)/1000.0);
+		  double vy=100.0*(1.0-(double)(rand()%2000)/1000.0);
 		  double ax=0.0;
 		  double ay=10.0;
-		  players.push_back(new Player(renderer,x,y,vx,vy,ax,ay));
+		  sprites.push_back(new Particle(renderer,"img/player.bmp",x,y,vx,vy,ax,ay));
 	    }
-		SDL_FreeSurface(bitmapSurface);
+	    p=new Player(renderer,"img/player.bmp",10.0,10.0);
+	    p->setBounds(0,0,w,h);
+	    sprites.push_back(p);
 	}
 	void doEvent(const SDL_Event &event){
+		p->handleEvent(event);
 	}
 	void loop(int millis) {
 		SDL_RenderClear(renderer);
-        SDL_RenderCopy(renderer, background, NULL, NULL);
-        for (auto p:players) p->loop(millis);
+        for (auto p:sprites) p->loop(millis);
         SDL_RenderPresent(renderer);
 	}
     ~Game() {
-		for (auto p:players) delete p;
-		SDL_DestroyTexture(background);
+		for (auto p:sprites) delete p;
 	}
 };
 
