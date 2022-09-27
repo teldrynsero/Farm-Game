@@ -1,14 +1,48 @@
-
-//  g++ -std=c++17 Simple.cpp -ID:/msys64/mingw64/include/SDL2 -LD:/msys64/mingw64/lib -Wall -lmingw32 -lSDL2main -lSDL2 -o Simple
-
 #include <string>
 #include <iostream>
 #include <vector>
+#include <map>
 #include <time.h>
 
-#include "SDL2/SDL.h"
+#include "SDL.h"
 
 using namespace std;
+
+class TextureInfo {
+	public:
+	SDL_Texture* texture;
+	SDL_Rect srcRect;
+	TextureInfo(SDL_Texture *newTexture=NULL,const SDL_Rect &newSrcRect={0,0,0,0}){
+		texture=newTexture;
+		srcRect=newSrcRect;
+	}
+};
+
+class MediaManager {
+	map<string,TextureInfo> images;
+	public:
+	SDL_Texture *read(SDL_Renderer *renderer,string filename,SDL_Rect &SrcR) {
+		if (images.find(filename)==images.end()) {
+	 	  SDL_Texture *image=NULL;
+		  SDL_Surface *bitmapSurface = NULL;
+		  bitmapSurface = SDL_LoadBMP(filename.c_str());
+		  SDL_SetColorKey(bitmapSurface,SDL_TRUE,SDL_MapRGB(bitmapSurface->format,0,0,255));
+		  SrcR.x = 0;
+		  SrcR.y = 0;
+		  SrcR.w = bitmapSurface->w;
+		  SrcR.h = bitmapSurface->h;
+		  image = SDL_CreateTextureFromSurface(renderer, bitmapSurface);		
+		  SDL_FreeSurface(bitmapSurface);
+		  images[filename]=TextureInfo(image,SrcR); // should do an insert
+		 //images.insert(pair<string,SDL_Texture*>(filename,image));
+		  return image;	
+	    }
+	  TextureInfo texture=images[filename];
+	  SrcR=texture.srcRect;  
+	  return texture.texture;// find and return second	
+	}
+};
+MediaManager mm;
 
 class ProtoGame {
 	SDL_Window *win;
@@ -65,23 +99,15 @@ class ProtoGame {
 
 class Sprite { // Just draw no physics or keyboard
 	SDL_Renderer *renderer;
+	protected:
 	SDL_Texture *image;
 	SDL_Rect SrcR,DestR;
-	protected:
 	double px,py;
 	public:
 	Sprite(SDL_Renderer *newRenderer,string filename,double newPx=0.0,double newPy=0.0) {
 		renderer=newRenderer;
-		image=NULL;
-		SDL_Surface *bitmapSurface = NULL;
-		bitmapSurface = SDL_LoadBMP(filename.c_str());
-		SrcR.x = 0;
-		SrcR.y = 0;
-		SrcR.w = bitmapSurface->w;
-		SrcR.h = bitmapSurface->h;
+		image=mm.read(renderer,filename,SrcR);
 		DestR=SrcR;
-		image = SDL_CreateTextureFromSurface(renderer, bitmapSurface);		
-		SDL_FreeSurface(bitmapSurface);
 		px=newPx;
 		py=newPy;
 	}
@@ -93,6 +119,26 @@ class Sprite { // Just draw no physics or keyboard
 	}
 	virtual ~Sprite() {
 		SDL_DestroyTexture(image);
+	}
+};
+
+class AnimationFrame {
+	public:
+	SDL_Texture *texture;
+	int time;
+	AnimationFrame(SDL_Texture *newTexture=NULL,int newTime=100){
+		texture=newTexture;
+		time=newTime;
+	}
+};
+
+class Animation:public Sprite {
+	vector<AnimationFrame> images;
+	int totalTime;
+	Animation(SDL_Renderer *newRenderer,string filename,int frames=1,int millisPerFrame=100,double newPx=0.0,double newPy=0.0) 
+	  :Sprite(newRenderer,filename,newPx,newPy){
+		images.push_back(AnimationFrame(image,millisPerFrame));
+		 
 	}
 };
 
@@ -118,7 +164,9 @@ class Player:public Sprite { // keyboard makes you move around
 		   if (e.key.keysym.sym==SDLK_a) px--;
 		   if (e.key.keysym.sym==SDLK_w) py--;
 		   if (e.key.keysym.sym==SDLK_s) py++;
-		   if (e.key.keysym.sym==SDLK_d) px++;	    
+		   if (e.key.keysym.sym==SDLK_d) px++;	
+		   //cout << px << endl;
+		   //cout << py << endl;    
 		}
 		if (px<minX && minX!=-1) px=0;
 		if (px>maxX && maxX!=-1) px=640;
@@ -160,12 +208,12 @@ class Game:public ProtoGame {
 	Player *p;
 	Sprite *background;
 	public:
-	Game():ProtoGame("Space Farm Game",640,480,10){  // Size,Seed
+	Game():ProtoGame("Space Game",640,480,10){  // Size,Seed
 		background = new Sprite(renderer, "img/hello.bmp");
 		sprites.push_back(background);
-		double sx=getW()/2.0;
-		double sy=getH()/2.0;
-		for (int i=0;i<100;i++) { //  Initialize Level loop
+		//double sx=getW()/2.0;
+		//double sy=getH()/2.0;
+		/* for (int i=0;i<1000;i++) { //  Initialize Level loop
 		  double x=sx;
 		  double y=sy;
 		  double vx=100.0*(1.0-(double)(rand()%2000)/1000.0);
@@ -173,9 +221,11 @@ class Game:public ProtoGame {
 		  double ax=0.0;
 		  double ay=10.0;
 		  sprites.push_back(new Particle(renderer,"img/player.bmp",x,y,vx,vy,ax,ay));
-	    }
+	    } */
 	    p=new Player(renderer,"img/player.bmp",10.0,10.0);
-	    p->setBounds(0,0,w,h);
+		//sprites.push_back(new Player(renderer,"img/player.bmp",10.0,10.0));
+		//sprites.push_back(p);
+	    p->setBounds(0,w,0,h);
 	    sprites.push_back(p);
 	}
 	void doEvent(const SDL_Event &event){
