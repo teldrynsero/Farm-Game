@@ -308,6 +308,7 @@ class Game:public ProtoGame {
 		background = new Sprite(renderer, "img/morning_0.bmp");
 		sprites.push_back(background);
 		sprites.push_back(new Animation(renderer,"img/morning_",2,1000,0,0));
+		sprites.push_back(new Animation(renderer,"img/HoneyshroomsStage_",3,1000,100,100));
 		//double sx=getW()/2.0;
 		//double sy=getH()/2.0;
 		for (int i=0;i<10;i++) { //  Initialize Level loop
