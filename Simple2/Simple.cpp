@@ -200,17 +200,21 @@ class Animation:public Sprite {
 			totalTime+=millisPerFrame;
 			cout << filename << i << ".bmp" << endl;
 		}
-		currentTime=0;
+		currentTime=rand()%600;
 	}
 	void loop(int millis) {
         DestR.x=(int)px; 
         DestR.y=(int)py;        
         // convert current time to the frame of animation we need
-        unsigned current=currentTime/100;
-        if (current>images.size()) current=0;    
-        SDL_RenderCopy(renderer, images[current/100].texture, &SrcR, &DestR);
-        currentTime+=millis;
-        currentTime=currentTime%totalTime;
+		cout << currentTime << endl;
+        unsigned current=abs(currentTime)/100;
+		cout << "CURRENT: " << current << endl;
+        if (current>images.size()){
+			current=0;  
+		}
+		//cout << currentTime << ' ' << current << endl;  
+        SDL_RenderCopy(renderer, images[current].texture, &SrcR, &DestR);
+        currentTime=(currentTime+millis)%totalTime;
 	}
 };
 
@@ -314,7 +318,7 @@ class Game:public ProtoGame {
 		  double ay=10.0;
 		  sprites.push_back(new Particle(renderer,"img/star.bmp",10,10,vx,vy,ax,ay));
 	    } 
-		//sprites.push_back(new Animation(renderer,"img/player_",3,100,0,0));
+		sprites.push_back(new Animation(renderer,"img/player_",4,100,0,0));
 	    p=new Player(renderer,filename,30.0,30.0);
 	    p->setBounds(0,w,0,h);
 	    sprites.push_back(p);
