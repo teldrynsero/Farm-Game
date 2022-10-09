@@ -9,7 +9,7 @@
 
 using namespace std;
 
-//string filename = "img/player_0.bmp";
+string filename = "img/player_0.bmp";
 
 class TextureInfo {
 	public:
@@ -28,7 +28,6 @@ class TextureInfo {
 	LTexture gSpriteSheetTexture;
     //Loading success flag
     bool success = true;
-
     //Load sprite sheet texture
     if( !gSpriteSheetTexture.loadFromFile( "spritesheet.bmp" ) )
     {
@@ -42,7 +41,6 @@ class TextureInfo {
         gSpriteClips[ 0 ].y =   0;
         gSpriteClips[ 0 ].w = 70;
         gSpriteClips[ 0 ].h = 110;
-
         //Set back facing sprite
         gSpriteClips[ 1 ].x = 70;
         gSpriteClips[ 1 ].y =   0;
@@ -54,14 +52,12 @@ class TextureInfo {
         gSpriteClips[ 2 ].y = 0;
         gSpriteClips[ 2 ].w = 70;
         gSpriteClips[ 2 ].h = 110;
-
         //Set right facing sprite
         gSpriteClips[ 3 ].x = 210;
         gSpriteClips[ 3 ].y = 0;
         gSpriteClips[ 3 ].w = 70;
         gSpriteClips[ 3 ].h = 110;
     }
-
     return success;
 } */
 
@@ -109,7 +105,7 @@ class ProtoGame {
 		w = newWidth;  //  Dimensions are part of the protogame class
 		h = newHeight;
 		loopShouldStop = SDL_FALSE;
-		SDL_Init(SDL_INIT_VIDEO);
+		SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 		// Added some parameters to constructor to set and store dimensions
 		win = SDL_CreateWindow(name.c_str(),SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,w,h,0);
 		renderer = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
@@ -192,7 +188,7 @@ class AnimationFrame {
 class Animation:public Sprite {
 	vector<AnimationFrame> images;
 	int totalTime;
-	int currentTime;
+	long currentTime;
 	public:
 	Animation(SDL_Renderer *newRenderer,string filename,int frames=1,int millisPerFrame=100,double newPx=0.0,double newPy=0.0) 
 	  :Sprite(newRenderer,filename+"0.bmp",newPx,newPy){
@@ -202,6 +198,7 @@ class Animation:public Sprite {
 			SDL_Texture *t=mm.read(renderer,filename+to_string(i)+".bmp",SrcR);
 			images.push_back(AnimationFrame(t,millisPerFrame));
 			totalTime+=millisPerFrame;
+			cout << filename << i << ".bmp" << endl;
 		}
 		currentTime=0;
 	}
@@ -211,7 +208,7 @@ class Animation:public Sprite {
         // convert current time to the frame of animation we need
         unsigned current=currentTime/100;
         if (current>images.size()) current=0;    
-        SDL_RenderCopy(renderer, images[currentTime/100].texture, &SrcR, &DestR);
+        SDL_RenderCopy(renderer, images[current/100].texture, &SrcR, &DestR);
         currentTime+=millis;
         currentTime=currentTime%totalTime;
 	}
@@ -239,7 +236,7 @@ class Player:public Sprite { // keyboard makes you move around
 			if (e.key.keysym.sym==SDLK_a)
 			{
 				px--;
-				//filename = "img/player_2.bmp";
+				filename = "img/player_2.bmp";
 			}
 			if (e.key.keysym.sym==SDLK_w)
 			{
@@ -304,7 +301,7 @@ class Game:public ProtoGame {
 	//string filename = "img/player.bmp";
 	public:
 	Game():ProtoGame("Space Game",640,480,10){  // Size,Seed
-		background = new Sprite(renderer, "img/morning.bmp");
+		background = new Sprite(renderer, "img/morning_0.bmp");
 		sprites.push_back(background);
 		//double sx=getW()/2.0;
 		//double sy=getH()/2.0;
@@ -317,7 +314,8 @@ class Game:public ProtoGame {
 		  double ay=10.0;
 		  sprites.push_back(new Particle(renderer,"img/star.bmp",10,10,vx,vy,ax,ay));
 	    } 
-	    p=new Player(renderer,"img/player_0.bmp",20.0,20.0);
+		//sprites.push_back(new Animation(renderer,"img/player_",3,100,0,0));
+	    p=new Player(renderer,filename,30.0,30.0);
 	    p->setBounds(0,w,0,h);
 	    sprites.push_back(p);
 
@@ -331,6 +329,8 @@ class Game:public ProtoGame {
 	}
 	void doEvent(const SDL_Event &event){
 		p->handleEvent(event);
+		//delete p;
+		//p=new Player(renderer,filename,0,0);
 	}
 	void loop(int millis) {
 		SDL_RenderClear(renderer);
