@@ -206,11 +206,11 @@ class Animation:public Sprite {
         DestR.x=(int)px; 
         DestR.y=(int)py;        
         // convert current time to the frame of animation we need
-		cout << currentTime << endl;
-        unsigned current=abs(currentTime)/100;
-		cout << "CURRENT: " << current << endl;
+		//cout << currentTime << endl;
+        unsigned current=abs(currentTime)/1000;
+		//cout << "CURRENT: " << current << endl;
         if (current>images.size()){
-			current=0;  
+			current=0;
 		}
 		//cout << currentTime << ' ' << current << endl;  
         SDL_RenderCopy(renderer, images[current].texture, &SrcR, &DestR);
@@ -240,7 +240,7 @@ class Player:public Sprite { // keyboard makes you move around
 			if (e.key.keysym.sym==SDLK_a)
 			{
 				px--;
-				filename = "img/player_2.bmp";
+				//filename = "img/player_2.bmp";
 			}
 			if (e.key.keysym.sym==SDLK_w)
 			{
@@ -307,6 +307,7 @@ class Game:public ProtoGame {
 	Game():ProtoGame("Space Game",640,480,10){  // Size,Seed
 		background = new Sprite(renderer, "img/morning_0.bmp");
 		sprites.push_back(background);
+		sprites.push_back(new Animation(renderer,"img/morning_",2,1000,0,0));
 		//double sx=getW()/2.0;
 		//double sy=getH()/2.0;
 		for (int i=0;i<10;i++) { //  Initialize Level loop
@@ -318,7 +319,6 @@ class Game:public ProtoGame {
 		  double ay=10.0;
 		  sprites.push_back(new Particle(renderer,"img/star.bmp",10,10,vx,vy,ax,ay));
 	    } 
-		sprites.push_back(new Animation(renderer,"img/player_",4,100,0,0));
 	    p=new Player(renderer,filename,30.0,30.0);
 	    p->setBounds(0,w,0,h);
 	    sprites.push_back(p);
