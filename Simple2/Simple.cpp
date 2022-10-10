@@ -242,7 +242,7 @@ class Player:public Sprite { // keyboard makes you move around
 			if (e.key.keysym.sym==SDLK_a)
 			{
 				px--;
-				//filename = "img/player_2.bmp";
+				filename = "img/player_2.bmp";
 			}
 			if (e.key.keysym.sym==SDLK_w)
 			{
@@ -261,17 +261,23 @@ class Player:public Sprite { // keyboard makes you move around
 			}
 			if (e.key.keysym.sym==SDLK_e)
 			{
+				Mix_Music *plant = Mix_LoadMUS("img/plant.wav");
+				if(Mix_PlayMusic(plant, 1) == -1)
+				{
+					printf(".WAV sound could not be played!\n"
+							"SDL_Error: %s\n", SDL_GetError());
+				}
 				newplant = new Animation(renderer,"img/HoneyshroomsStage_",3,1000,px,py);
 				plantTrigger = true;
 			}
-			cout << plantTrigger << endl;
+			//cout << plantTrigger << endl;
 			//cout << filename << endl;
 			//cout << px << endl;
 			//cout << py << endl;    
 		}
 		if (px<minX && minX!=-1) px=0;
 		if (px>maxX && maxX!=-1) px=640;
-		if (py<minY && minY!=-1) py=0;
+		if (py<minY && minY!=-1) py=60;
 		if (py>maxY && maxY!=-1) py=480;
 
 		//return filename;
@@ -310,13 +316,16 @@ class Game:public ProtoGame {
 	vector<Sprite *> sprites;
 	Player *p;
 	Sprite *background;
+	Sprite *ground;
 	//string filename = "img/player.bmp";
 	public:
 	Game():ProtoGame("Space Game",640,480,10){  // Size,Seed
 		background = new Sprite(renderer, "img/morning_0.bmp");
 		sprites.push_back(background);
 		sprites.push_back(new Animation(renderer,"img/morning_",2,1000,0,0));
-		sprites.push_back(new Animation(renderer,"img/HoneyshroomsStage_",3,1000,100,100));
+		ground = new Sprite(renderer, "img/ground.bmp");
+		sprites.push_back(ground);
+		sprites.push_back(new Animation(renderer,"img/HoneyshroomsStage_",3,1000,500,300));
 		//double sx=getW()/2.0;
 		//double sy=getH()/2.0;
 		for (int i=0;i<10;i++) { //  Initialize Level loop
@@ -328,8 +337,8 @@ class Game:public ProtoGame {
 		  double ay=10.0;
 		  sprites.push_back(new Particle(renderer,"img/star.bmp",10,10,vx,vy,ax,ay));
 	    } 
-	    p=new Player(renderer,filename,30.0,30.0);
-	    p->setBounds(0,w,0,h);
+	    p=new Player(renderer,filename,60.0,60.0);
+	    p->setBounds(0,w,60,h);
 	    sprites.push_back(p);
 		if(plantTrigger == true){
 			sprites.push_back(newplant);
@@ -337,7 +346,7 @@ class Game:public ProtoGame {
 		}
 		cout << plantTrigger << endl;
 
-		Mix_Chunk *waves=mm.readWAV("img/Electronic Fantasy.ogg");
+		Mix_Chunk *waves=mm.readWAV("img/earthshine.mp3");
 	    if(Mix_PlayChannel(-1, waves, -1) == -1)
 		{
 			cout << "ERROR" << endl;
@@ -347,6 +356,7 @@ class Game:public ProtoGame {
 	}
 	void doEvent(const SDL_Event &event){
 		p->handleEvent(event);
+		sprites.push_back(p);
 		//delete p;
 		//p=new Player(renderer,filename,0,0);
 		if(plantTrigger == true){
