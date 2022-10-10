@@ -322,7 +322,7 @@ class Game:public ProtoGame {
 	Game():ProtoGame("Space Game",640,480,10){  // Size,Seed
 		background = new Sprite(renderer, "img/morning_0.bmp");
 		sprites.push_back(background);
-		sprites.push_back(new Animation(renderer,"img/morning_",2,1000,0,0));
+		sprites.push_back(new Animation(renderer,"img/morning_",7,1000,0,0));
 		ground = new Sprite(renderer, "img/ground.bmp");
 		sprites.push_back(ground);
 		sprites.push_back(new Animation(renderer,"img/HoneyshroomsStage_",3,1000,500,300));
@@ -357,8 +357,6 @@ class Game:public ProtoGame {
 	void doEvent(const SDL_Event &event){
 		p->handleEvent(event);
 		sprites.push_back(p);
-		//delete p;
-		//p=new Player(renderer,filename,0,0);
 		if(plantTrigger == true){
 			sprites.push_back(newplant);
 			plantTrigger = false;
