@@ -218,6 +218,8 @@ class Animation:public Sprite {
 	}
 };
 
+Sprite *newplant;
+bool plantTrigger = false;
 class Player:public Sprite { // keyboard makes you move around
 	int minX,maxX,minY,maxY;
 	public:
@@ -257,6 +259,12 @@ class Player:public Sprite { // keyboard makes you move around
 				px++;
 				//filename = "img/player_3.bmp";
 			}
+			if (e.key.keysym.sym==SDLK_e)
+			{
+				newplant = new Animation(renderer,"img/HoneyshroomsStage_",3,1000,px,py);
+				plantTrigger = true;
+			}
+			cout << plantTrigger << endl;
 			//cout << filename << endl;
 			//cout << px << endl;
 			//cout << py << endl;    
@@ -323,6 +331,11 @@ class Game:public ProtoGame {
 	    p=new Player(renderer,filename,30.0,30.0);
 	    p->setBounds(0,w,0,h);
 	    sprites.push_back(p);
+		if(plantTrigger == true){
+			sprites.push_back(newplant);
+			plantTrigger = false;
+		}
+		cout << plantTrigger << endl;
 
 		Mix_Chunk *waves=mm.readWAV("img/Electronic Fantasy.ogg");
 	    if(Mix_PlayChannel(-1, waves, -1) == -1)
@@ -336,6 +349,10 @@ class Game:public ProtoGame {
 		p->handleEvent(event);
 		//delete p;
 		//p=new Player(renderer,filename,0,0);
+		if(plantTrigger == true){
+			sprites.push_back(newplant);
+			plantTrigger = false;
+		}
 	}
 	void loop(int millis) {
 		SDL_RenderClear(renderer);
