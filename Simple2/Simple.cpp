@@ -21,46 +21,6 @@ class TextureInfo {
 	}
 };
 
-/* bool loadMedia()
-{
-	//Scene sprites
-	SDL_Rect gSpriteClips[ 4 ];
-	LTexture gSpriteSheetTexture;
-    //Loading success flag
-    bool success = true;
-    //Load sprite sheet texture
-    if( !gSpriteSheetTexture.loadFromFile( "spritesheet.bmp" ) )
-    {
-        printf( "Failed to load sprite sheet texture!\n" );
-        success = false;
-    }
-    else
-    {
-        //Set front facing sprite
-        gSpriteClips[ 0 ].x =   0;
-        gSpriteClips[ 0 ].y =   0;
-        gSpriteClips[ 0 ].w = 70;
-        gSpriteClips[ 0 ].h = 110;
-        //Set back facing sprite
-        gSpriteClips[ 1 ].x = 70;
-        gSpriteClips[ 1 ].y =   0;
-        gSpriteClips[ 1 ].w = 70;
-        gSpriteClips[ 1 ].h = 110;
-        
-        //Set left facing sprite
-        gSpriteClips[ 2 ].x = 140;
-        gSpriteClips[ 2 ].y = 0;
-        gSpriteClips[ 2 ].w = 70;
-        gSpriteClips[ 2 ].h = 110;
-        //Set right facing sprite
-        gSpriteClips[ 3 ].x = 210;
-        gSpriteClips[ 3 ].y = 0;
-        gSpriteClips[ 3 ].w = 70;
-        gSpriteClips[ 3 ].h = 110;
-    }
-    return success;
-} */
-
 class MediaManager {
 	map<string,TextureInfo> images;
 	public:
@@ -352,7 +312,6 @@ class Game:public ProtoGame {
 			cout << "ERROR" << endl;
 			cout << Mix_GetError() << endl;
 		}
-	    	//throw Exception("Could not play waves file");
 	}
 	void doEvent(const SDL_Event &event){
 		p->handleEvent(event);
