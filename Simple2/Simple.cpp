@@ -115,6 +115,7 @@ class Sprite { // Just draw no physics or keyboard
 	SDL_Texture *image;
 	SDL_Rect SrcR,DestR;
 	double px,py;
+	bool watered;
 	public:
 	Sprite(SDL_Renderer *newRenderer,string filename,double newPx=0.0,double newPy=0.0) {
 		renderer=newRenderer;
@@ -132,6 +133,18 @@ class Sprite { // Just draw no physics or keyboard
 	}
 	virtual ~Sprite() {
 		SDL_DestroyTexture(image);
+	}
+	void setWatered(bool m){
+		watered = m;
+	};
+	int getPx(){
+		return px;
+	}
+	int getPy(){
+		return py;
+	}
+	bool getWatered(){
+		return watered;
 	}
 };
 
@@ -178,8 +191,89 @@ class Animation:public Sprite {
 	}
 };
 
-Sprite *newplant;
+class Plant:public Sprite {
+	vector<AnimationFrame> images;
+	int totalTime;
+	long currentTime;
+	unsigned int framesNeeded;
+	unsigned current = 0;
+	public:
+	Plant(SDL_Renderer *newRenderer,string filename,int frames=1,int millisPerFrame=100,double newPx=0.0,double newPy=0.0) 
+	  :Sprite(newRenderer,filename+"0.bmp",newPx,newPy){
+		images.push_back(AnimationFrame(image,millisPerFrame));
+		totalTime=millisPerFrame;
+		framesNeeded = frames;
+		watered = false;
+		for (int i=1;i<frames;i++) {
+			SDL_Texture *t=mm.read(renderer,filename+to_string(i)+".bmp",SrcR);
+			images.push_back(AnimationFrame(t,millisPerFrame));
+			totalTime+=millisPerFrame;
+			cout << filename << i << ".bmp" << endl;
+		}
+		currentTime=rand()%600;
+	}
+	void loop(int millis) {
+        DestR.x=(int)px; 
+        DestR.y=(int)py;        
+        // convert current time to the frame of animation we need
+		//cout << currentTime << endl;
+
+        //unsigned current=abs(currentTime)/1000;
+
+		//cout << "CURRENT: " << current << endl;
+        /*if (current>images.size()){
+			current=0;
+		}*/
+		//cout << currentTime << ' ' << current << endl;
+		/*cout << "Current Time Before" << currentTime << endl;
+        SDL_RenderCopy(renderer, images[current].texture, &SrcR, &DestR);
+        currentTime=(currentTime+millis)%totalTime;
+		cout << "Current Time After" << currentTime << endl; 
+		cout << current << "djjjjjjj" << endl;*/
+		//cout << framesNeeded << endl;
+		//cout << images.size() << endl;
+		if(current <= framesNeeded)
+		{
+			if(watered == true)
+			{
+				//cout << current << "QQQQQQQQQQ" << endl;
+				SDL_RenderCopy(renderer, images[current].texture, &SrcR, &DestR);
+				currentTime=(currentTime+millis)%totalTime;
+				watered = false;
+				current++;
+			}
+			else
+			{
+				//cout << current << "RRRRRRRRRR" << endl;
+				if(current == 0)
+				{
+					//cout << current << "PPPPPPPPPPPP" << endl;
+					SDL_RenderCopy(renderer, images[current].texture, &SrcR, &DestR);
+					currentTime=(currentTime+millis)%totalTime;
+				}
+				else
+				{
+					//current--;
+					SDL_RenderCopy(renderer, images[current].texture, &SrcR, &DestR);
+					currentTime=(currentTime+millis)%totalTime;
+					//cout << "dddddddddddddddddddd" << current << endl;
+				}
+			}
+		}
+
+	}
+	int getPlantpx(){
+		return px;
+	}
+	int getPlantpy(){
+		return py;
+	}
+};
+
+vector<Plant *> plants;
+Plant *newplant;
 bool plantTrigger = false;
+bool plantWaterTrigger = false;
 class Player:public Sprite { // keyboard makes you move around
 	int minX,maxX,minY,maxY;
 	public:
@@ -221,16 +315,47 @@ class Player:public Sprite { // keyboard makes you move around
 			}
 			if (e.key.keysym.sym==SDLK_e)
 			{
-				Mix_Music *plant = Mix_LoadMUS("img/plant.wav");
+				if(py > 164)
+				{
+					Mix_Music *plant = Mix_LoadMUS("img/plant.wav");
+					if(Mix_PlayMusic(plant, 1) == -1)
+					{
+						printf(".WAV sound could not be played!\n"
+								"SDL_Error: %s\n", SDL_GetError());
+					}
+					newplant = new Plant(renderer,"img/HoneyshroomsStage_",3,1000,px,py);
+					plants.push_back(newplant);
+					plantTrigger = true;
+				}
+				/*Mix_Music *plant = Mix_LoadMUS("img/plant.wav");
 				if(Mix_PlayMusic(plant, 1) == -1)
 				{
 					printf(".WAV sound could not be played!\n"
 							"SDL_Error: %s\n", SDL_GetError());
 				}
-				newplant = new Animation(renderer,"img/HoneyshroomsStage_",3,1000,px,py);
-				plantTrigger = true;
+				newplant = new Plant(renderer,"img/HoneyshroomsStage_",3,1000,px,py);
+				plants.push_back(newplant);
+				plantTrigger = true;*/
 			}
-			//cout << plantTrigger << endl;
+			if (e.key.keysym.sym==SDLK_q)
+			{
+				Mix_Music *plant = Mix_LoadMUS("img/water.wav");
+				if(Mix_PlayMusic(plant, 1) == -1)
+				{
+					printf(".WAV sound could not be played!\n"
+							"SDL_Error: %s\n", SDL_GetError());
+				}
+				for (auto &h : plants) {
+					if( (px < h->getPlantpx() + 30 && px > h->getPlantpx() - 30) && 
+						(py < h->getPlantpy() + 10 && py > h->getPlantpy() - 10))
+					{
+						//cout << "Player Not Water " << h->getWatered() << endl;
+						h->setWatered(true);
+						//cout << "Player Not Water " << h->getWatered() << endl;
+						plantWaterTrigger = true;
+					}
+				}
+			}
 			//cout << filename << endl;
 			//cout << px << endl;
 			//cout << py << endl;    
@@ -300,11 +425,6 @@ class Game:public ProtoGame {
 	    p=new Player(renderer,filename,60.0,60.0);
 	    p->setBounds(0,w,60,h);
 	    sprites.push_back(p);
-		if(plantTrigger == true){
-			sprites.push_back(newplant);
-			plantTrigger = false;
-		}
-		cout << plantTrigger << endl;
 
 		Mix_Chunk *waves=mm.readWAV("img/earthshine.mp3");
 	    if(Mix_PlayChannel(-1, waves, -1) == -1)
@@ -320,6 +440,16 @@ class Game:public ProtoGame {
 			sprites.push_back(newplant);
 			plantTrigger = false;
 		}
+		/*if(plantWaterTrigger == true){
+			cout << "Plant Water Trigger is True" << endl;
+			for (auto &k : sprites) {
+					cout << " K " << k->getWatered() << endl;
+					cout << " " << k->getPx() << endl;
+					cout << " " << k->getPy() << endl;
+			}
+			plantWaterTrigger = false;
+			if(plantWaterTrigger == false) {cout << "Plant Water Trigger is False" << endl;}
+		}*/
 	}
 	void loop(int millis) {
 		SDL_RenderClear(renderer);
