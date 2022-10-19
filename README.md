@@ -5,7 +5,7 @@ Game inspirations: Harvest Moon, Rune Factory, Slime Rancher, Stardew Valley
 
 ## To Do
 - Inventory / Menu
-- Player walking sprites
+- Player animated walking sprites (expand the sprite sheet)
 - More plants
 - Tools + mechanics (water can, hoe)
 - NPC interactions?
