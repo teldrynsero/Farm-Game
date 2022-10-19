@@ -3,7 +3,7 @@ Space Farm (working title) tells the story of a frog astronaut who leaves his ho
 
 Game inspirations: Harvest Moon, Rune Factory, Slime Rancher, Stardew Valley
 
-##To Do
+## To Do
 - Inventory / Menu
 - Player walking sprites
 - More plants
@@ -13,10 +13,10 @@ Game inspirations: Harvest Moon, Rune Factory, Slime Rancher, Stardew Valley
 - Beginning story intro cutscene?
 - Survival (drinking/eating) mechanics?
 
-##Currently Doing
+## Currently Doing
 - n/a
 
-##Done
+## Done
 - Sky, player, (1) plant, ground, star images
 - Sky that transitions between day and night
 - Background music and (planting and watering) sound effects
