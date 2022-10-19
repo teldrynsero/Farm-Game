@@ -20,4 +20,4 @@ Game inspirations: Harvest Moon, Rune Factory, Slime Rancher, Stardew Valley
 - Sky, player, (1) plant, ground, star images
 - Sky that transitions between day and night
 - Background music and (planting and watering) sound effects
--Plant growing cycle + watering mechanic
+- Plant growing cycle + watering mechanic
