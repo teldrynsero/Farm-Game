@@ -7,10 +7,13 @@ WINLOC=$(GAMELOC)
 WINSDLCFLAGS=-I$(WINLOC)/msys2/mingw64/include/SDL2/ -Dmain=SDL_main
 WINSDLLIBS=-L$(WINLOC)/msys2/mingw64/lib/ -lmingw32 -mwindows -lSDL2main -lSDL2
 
-Simple.exe: Simple.cpp
-	g++ -std=c++17 Simple.cpp -ID:/msys64/mingw64/include/SDL2 -LD:/msys64/mingw64/lib -Wall -lmingw32 -lSDL2main -lSDL2 -o Simple
+SRCDIR=src
+SRCS=$(SRCDIR)/Simple.cpp
 
-Simple: Simple.cpp
+Simple.exe: $(SRCS)
+	g++ -std=c++17 src/Simple.cpp -ID:/msys64/mingw64/include/SDL2 -LD:/msys64/mingw64/lib -Wall -lmingw32 -lSDL2main -lSDL2 -lSDL2_mixer -lSDL2_ttf -o Simple
+
+Simple: $(SRCS)
 	g++ -g -Wall $(SDLCFLAGS) -o $@ $? $(SDLLIBS)
 
 clean: 
