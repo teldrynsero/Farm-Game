@@ -40,9 +40,14 @@ EXE=$(BUILDDIR)/Simple.exe
 SCRIPTS=Simple.sh Simple.bat
 
 MEDIADIR=img
-MEDIA=$(MEDIADIR)/hello.bmp  $(MEDIADIR)/P15_0.bmp  $(MEDIADIR)/P15_1.bmp \
-$(MEDIADIR)/P15_2.bmp  $(MEDIADIR)/P15_3.bmp  $(MEDIADIR)/P15_4.bmp \
-$(MEDIADIR)/P15_5.bmp  $(MEDIADIR)/player.bmp $(MEDIADIR)/crash.wav
+MEDIA=$(MEDIADIR)/earthshine.mp3  $(MEDIADIR)/farmland.bmp  $(MEDIADIR)/ground.bmp \
+$(MEDIADIR)/HoneyshroomStage_0  $(MEDIADIR)/HoneyshroomsStage_1.bmp  $(MEDIADIR)/HoneyshroomsStage_2.bmp \
+$(MEDIADIR)/morning_0.bmp  $(MEDIADIR)/morning_1.bmp $(MEDIADIR)/morning_2.bmp \
+$(MEDIADIR)/morning_3.bmp  $(MEDIADIR)/morning_4.bmp  $(MEDIADIR)/morning_5.bmp \
+$(MEDIADIR)/morning_6.bmp  $(MEDIADIR)/morning_7.bmp  $(MEDIADIR)/Pixeled.ttf \
+$(MEDIADIR)/plant.wav  $(MEDIADIR)/player_0.bmp  $(MEDIADIR)/player_1.bmp \
+$(MEDIADIR)/player_2.bmp  $(MEDIADIR)/player_3.bmp  $(MEDIADIR)/spritesheet.bmp \
+$(MEDIADIR)/star.bmp  $(MEDIADIR)/water.wav
 
 BUILDDIR=build
 BUILDFILES=Makefile
