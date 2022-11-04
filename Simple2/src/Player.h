@@ -4,6 +4,9 @@ bool plantTrigger = false;
 bool plantWaterTrigger = false;
 class Player:public Sprite { // keyboard makes you move around
 	int minX,maxX,minY,maxY;
+
+	string filename;
+
 	public:
 	Player(SDL_Renderer *newRenderer,string filename,
 	  double newPx=0.0,double newPy=0.0):Sprite(newRenderer,filename,newPx,newPy) {

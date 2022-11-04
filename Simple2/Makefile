@@ -41,7 +41,7 @@ SCRIPTS=Simple.sh Simple.bat
 
 MEDIADIR=img
 MEDIA=$(MEDIADIR)/earthshine.mp3  $(MEDIADIR)/farmland.bmp  $(MEDIADIR)/ground.bmp \
-$(MEDIADIR)/HoneyshroomStage_0  $(MEDIADIR)/HoneyshroomsStage_1.bmp  $(MEDIADIR)/HoneyshroomsStage_2.bmp \
+$(MEDIADIR)/HoneyshroomsStage_0.bmp  $(MEDIADIR)/HoneyshroomsStage_1.bmp  $(MEDIADIR)/HoneyshroomsStage_2.bmp \
 $(MEDIADIR)/morning_0.bmp  $(MEDIADIR)/morning_1.bmp $(MEDIADIR)/morning_2.bmp \
 $(MEDIADIR)/morning_3.bmp  $(MEDIADIR)/morning_4.bmp  $(MEDIADIR)/morning_5.bmp \
 $(MEDIADIR)/morning_6.bmp  $(MEDIADIR)/morning_7.bmp  $(MEDIADIR)/Pixeled.ttf \
