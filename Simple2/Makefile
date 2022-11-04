@@ -5,12 +5,12 @@
 #SDLLIBS=`sdl2-config --libs`
 
 ifeq ($(OS),Windows_NT) 
-	USER:=$(shell whoami)
-	ifeq ($(USER),desktop-r562qc4\kamja)
-		SDLCFLAGS=-IC:\msys64\mingw64\include\SDL2 -Dmain=SDL_main
-		SDLLIBS=-LC:\msys64\mingw64\lib -lmingw32 -mwindows -lSDL2main -lSDL2  -lSDL2_mixer
-		GCC=C:\msys64\mingw64\bin\g++.exe
-	endif
+#	USER:=$(shell whoami)
+#	ifeq ($(USER),desktop-r562qc4\kamja)
+	SDLCFLAGS=-IC:\msys64\mingw64\include\SDL2 -Dmain=SDL_main
+	SDLLIBS=-LC:\msys64\mingw64\lib -lmingw32 -mwindows -lSDL2main -lSDL2  -lSDL2_mixer
+	GCC=C:\msys64\mingw64\bin\g++.exe
+#	endif
 #	run whoami in cmd, copy/paste after $(USER),
 
 #	Your flags should look something like below
