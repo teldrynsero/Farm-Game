@@ -7,493 +7,34 @@
 #include "SDL.h"
 #include "SDL_mixer.h"
 #include "SDL_ttf.h"
+#include "imgui.h"
+#include "imgui_impl_sdl.h"
+#include "imgui_impl_sdlrenderer.h"
+
+#include "TextureInfo.h"
+#include "MediaManager.h"
+#include "ProtoGame.h"
+#include "Sprite.h"
+#include "Animation.h"
+#include "Plant.h"
+#include "Player.h"
+#include "Particle.h"
 
 using namespace std;
 
+bool show_demo_window = true;
+bool show_another_window = false;
+ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 string filename = "img/player_0.bmp";
-
-class TextureInfo {
-	public:
-	SDL_Texture* texture;
-	SDL_Rect srcRect;
-	TextureInfo(SDL_Texture *newTexture=NULL,const SDL_Rect &newSrcRect={0,0,0,0}){
-		texture=newTexture;
-		srcRect=newSrcRect;
-	}
-};
-
-class MediaManager {
-	map<string,TextureInfo> images;
-	public:
-	SDL_Texture *read(SDL_Renderer *renderer,string filename,SDL_Rect &SrcR) {
-		if (images.find(filename)==images.end()) {
-	 	  SDL_Texture *image=NULL;
-		  SDL_Surface *bitmapSurface = NULL;
-		  bitmapSurface = SDL_LoadBMP(filename.c_str());
-		  SDL_SetColorKey(bitmapSurface,SDL_TRUE,SDL_MapRGB(bitmapSurface->format,0,0,255));
-		  SrcR.x = 0;
-		  SrcR.y = 0;
-		  SrcR.w = bitmapSurface->w;
-		  SrcR.h = bitmapSurface->h;
-		  image = SDL_CreateTextureFromSurface(renderer, bitmapSurface);		
-		  SDL_FreeSurface(bitmapSurface);
-		  images[filename]=TextureInfo(image,SrcR); // should do an insert
-		 //images.insert(pair<string,SDL_Texture*>(filename,image));
-		  return image;	
-	    }
-	  TextureInfo texture=images[filename];
-	  SrcR=texture.srcRect;  
-	  return texture.texture;// find and return second
-	}
-
-	Mix_Chunk *readWAV(string music) {
-		Mix_Chunk *waves = Mix_LoadWAV(music.c_str());
-		if(!waves) cout << "ERROR: " << music << Mix_GetError() << endl; //throw Exception("Could not read WAV file "+filename);
-		return waves;
-	}	
-};
-MediaManager mm;
-
-class ProtoGame {
-	SDL_Window *win;
-	SDL_bool loopShouldStop;
-	protected:
-	int w,h;  //  Dimension of screen space
-	SDL_Renderer *renderer;
-	SDL_Surface * surface;
-	SDL_Texture * texture;
-	SDL_Rect dstrect;
-	public:
-	ProtoGame(string name,int newWidth=640,int newHeight=480,int seed=0) {
-		surface = NULL;
-		//dstrect = NULL;
-		win = NULL;
-		renderer = NULL;
-		w = newWidth;  //  Dimensions are part of the protogame class
-		h = newHeight;
-		loopShouldStop = SDL_FALSE;
-		SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
-		TTF_Init();
-
-		TTF_Font * font = TTF_OpenFont("arial.ttf", 25);
-		SDL_Color color = {255, 255, 255};
-		surface = TTF_RenderText_Shaded(font, "SPACE GAME", color, {255,200,200});
-		texture = SDL_CreateTextureFromSurface(renderer, surface);
-		int texW = 0;
-		int texH = 0;
-		dstrect = {100, 100, texW, texH};
-
-		SDL_QueryTexture(texture, NULL, NULL, &texW, &texH);
-
-		// Added some parameters to constructor to set and store dimensions
-		win = SDL_CreateWindow(name.c_str(),SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,w,h,0);
-		renderer = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
-		if(Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096) == -1)
-		{
-		 	cout << "SDL2_mixer ERROR" << endl;
-		}
-		if (seed==0) srand (time(NULL));
-		else srand(seed);
-	}
-
-	int getW() { return w; } // Read-Only accessor methods
-	int getH() { return h; } //  
-	void doLoop() {
-      int millis=SDL_GetTicks(); 
-      while (!loopShouldStop)
-      {
-		unsigned millisDt=millis-SDL_GetTicks();  // Calculate millis
-        SDL_Event event;
-        while (SDL_PollEvent(&event))
-        {
-            switch (event.type)
-            {
-                case SDL_QUIT:
-                    loopShouldStop = SDL_TRUE;
-                    break;
-            }
-            doEvent(event);
-        }
-        if (millisDt>1) {  //
-			loop(millisDt);
-            millis=SDL_GetTicks();
-		}
-      }
-	}
-	virtual void doEvent(const SDL_Event &event)=0;
-	virtual void loop(int millis)=0;
-	~ProtoGame() {
-	  SDL_DestroyTexture(texture);
-	  SDL_FreeSurface(surface);
-	  //TTF_CloseFont(font);
-      SDL_DestroyRenderer(renderer);
-      SDL_DestroyWindow(win);
-	  TTF_Quit();
-      SDL_Quit();
-	}
-};
-
-class Sprite { // Just draw no physics or keyboard
-	protected:
-	SDL_Renderer *renderer;
-	SDL_Texture *image;
-	SDL_Rect SrcR,DestR;
-	double px,py;
-	bool watered;
-	public:
-	Sprite(SDL_Renderer *newRenderer,string filename,double newPx=0.0,double newPy=0.0) {
-		renderer=newRenderer;
-		image=mm.read(renderer,filename,SrcR);
-		//cout << "in class Sprite rendering " << filename << endl;
-		DestR=SrcR;
-		px=newPx;
-		py=newPy;
-	}
-	virtual void handleEvent(SDL_Event &e) {} 
-	virtual void loop(int millis) {
-        DestR.x=(int)px; 
-        DestR.y=(int)py;            
-        SDL_RenderCopy(renderer, image, &SrcR, &DestR);
-	}
-	virtual ~Sprite() {
-		SDL_DestroyTexture(image);
-	}
-	void setWatered(bool m){
-		watered = m;
-	};
-	int getPx(){
-		return px;
-	}
-	int getPy(){
-		return py;
-	}
-	bool getWatered(){
-		return watered;
-	}
-};
-/*
-textname = "img/Pixeled.ttf";
-
-class Text { // Just draw no physics or keyboard
-	protected:
-	SDL_Renderer *renderer;
-	SDL_Texture *image;
-	SDL_Rect SrcR,DestR;
-	double px,py;
-	public:
-	Text(SDL_Renderer *newRenderer,TTF_OpenFont(textname, 24),double newPx=0.0,double newPy=0.0) {
-		renderer=newRenderer;
-		image=mm.read(renderer,textname,SrcR);
-		//cout << "in class Sprite rendering " << filename << endl;
-		DestR=SrcR;
-		px=newPx;
-		py=newPy;
-	}
-	virtual void handleEvent(SDL_Event &e) {} 
-	virtual void loop(int millis) {
-        DestR.x=(int)px; 
-        DestR.y=(int)py;            
-        SDL_RenderCopy(renderer, image, &SrcR, &DestR);
-	}
-	virtual ~Text() {
-		SDL_DestroyTexture(image);
-	}
-	int getPx(){
-		return px;
-	}
-	int getPy(){
-		return py;
-	}
-};
-*/
-class AnimationFrame {
-	public:
-	SDL_Texture *texture;
-	int time;
-	AnimationFrame(SDL_Texture *newTexture=NULL,int newTime=100){
-		texture=newTexture;
-		time=newTime;
-	}
-};
-
-class Animation:public Sprite {
-	vector<AnimationFrame> images;
-	int totalTime;
-	long currentTime;
-	public:
-	Animation(SDL_Renderer *newRenderer,string filename,int frames=1,int millisPerFrame=100,double newPx=0.0,double newPy=0.0) 
-	  :Sprite(newRenderer,filename+"0.bmp",newPx,newPy){
-		images.push_back(AnimationFrame(image,millisPerFrame));
-		totalTime=millisPerFrame;
-		for (int i=1;i<frames;i++) {
-			SDL_Texture *t=mm.read(renderer,filename+to_string(i)+".bmp",SrcR);
-			images.push_back(AnimationFrame(t,millisPerFrame));
-			totalTime+=millisPerFrame;
-			//cout << filename << i << ".bmp" << endl;
-		}
-		currentTime=rand()%600;
-	}
-	void loop(int millis) {
-        DestR.x=(int)px; 
-        DestR.y=(int)py;        
-        // convert current time to the frame of animation we need
-		//cout << currentTime << endl;
-        unsigned current=abs(currentTime)/1000;
-		//cout << "CURRENT: " << current << endl;
-        if (current>images.size()){
-			current=0;
-		}
-		//cout << currentTime << ' ' << current << endl;  
-        SDL_RenderCopy(renderer, images[current].texture, &SrcR, &DestR);
-        currentTime=(currentTime+millis)%totalTime;
-	}
-};
-
-class Plant:public Sprite {
-	vector<AnimationFrame> images;
-	int totalTime;
-	long currentTime;
-	unsigned int framesNeeded;
-	unsigned current = 0;
-	public:
-	Plant(SDL_Renderer *newRenderer,string filename,int frames=1,int millisPerFrame=100,double newPx=0.0,double newPy=0.0) 
-	  :Sprite(newRenderer,filename+"0.bmp",newPx,newPy){
-		images.push_back(AnimationFrame(image,millisPerFrame));
-		totalTime=millisPerFrame;
-		framesNeeded = frames;
-		watered = false;
-		for (int i=1;i<frames;i++) {
-			SDL_Texture *t=mm.read(renderer,filename+to_string(i)+".bmp",SrcR);
-			images.push_back(AnimationFrame(t,millisPerFrame));
-			totalTime+=millisPerFrame;
-			//cout << filename << i << ".bmp" << endl;
-		}
-		currentTime=rand()%600;
-	}
-	void loop(int millis) {
-        DestR.x=(int)px; 
-        DestR.y=(int)py;        
-        // convert current time to the frame of animation we need
-		//cout << currentTime << endl;
-
-        //unsigned current=abs(currentTime)/1000;
-
-		//cout << "CURRENT: " << current << endl;
-        /*if (current>images.size()){
-			current=0;
-		}*/
-		//cout << currentTime << ' ' << current << endl;
-		/*cout << "Current Time Before" << currentTime << endl;
-        SDL_RenderCopy(renderer, images[current].texture, &SrcR, &DestR);
-        currentTime=(currentTime+millis)%totalTime;
-		cout << "Current Time After" << currentTime << endl; 
-		cout << current << "djjjjjjj" << endl;*/
-		//cout << framesNeeded << endl;
-		//cout << images.size() << endl;
-		if(current <= framesNeeded)
-		{
-			if(watered == true)
-			{
-				SDL_RenderCopy(renderer, images[current].texture, &SrcR, &DestR);
-				currentTime=(currentTime+millis)%totalTime;
-				watered = false;
-				current++;
-			}
-			else
-			{
-				if(current == 0)
-				{
-					SDL_RenderCopy(renderer, images[current].texture, &SrcR, &DestR);
-					currentTime=(currentTime+millis)%totalTime;
-				}
-				else
-				{
-					SDL_RenderCopy(renderer, images[current].texture, &SrcR, &DestR);
-					currentTime=(currentTime+millis)%totalTime;
-				}
-			}
-		}
-
-	}
-	int getPlantpx(){
-		return px;
-	}
-	int getPlantpy(){
-		return py;
-	}
-};
-
-vector<Plant *> plants;
-Plant *newplant;
-bool plantTrigger = false;
-bool plantWaterTrigger = false;
-
-class Player:public Sprite { // keyboard makes you move around
-	int minX,maxX,minY,maxY;
-	public:
-	Player(SDL_Renderer *newRenderer,string filename,
-	  double newPx=0.0,double newPy=0.0):Sprite(newRenderer,filename,newPx,newPy) {
-		  minX=-1;
-		  maxX=-1;
-		  minY=-1;
-		  maxY=-1;
-	}
-	void setBounds(int newMinX,int newMaxX,int newMinY,int newMaxY) {
-		minX=newMinX;
-		maxX=newMaxX;
-		minY=newMinY;
-		maxY=newMaxY;
-	}
-	void handleEvent(const SDL_Event &e) {
-		// is the event a A keypress
-		if (e.type==SDL_KEYDOWN) {
-			if (e.key.keysym.sym==SDLK_a)
-			{
-				px--;
-				filename = "img/player_2.bmp";
-				image=mm.read(renderer,filename,SrcR);
-			}
-			if (e.key.keysym.sym==SDLK_w)
-			{
-				py--;
-				filename = "img/player_1.bmp";
-				image=mm.read(renderer,filename,SrcR);
-			}
-			if (e.key.keysym.sym==SDLK_s)
-			{
-				py++;
-				filename = "img/player_0.bmp";
-				image=mm.read(renderer,filename,SrcR);
-			}
-			if (e.key.keysym.sym==SDLK_d)
-			{
-				px++;
-				filename = "img/player_3.bmp";
-				image=mm.read(renderer,filename,SrcR);
-			}
-			if (e.key.keysym.sym==SDLK_e)
-			{
-				if(py > 164)
-				{
-					//cout << "THis is Happening" << endl;
-					if(plants.empty() == true)
-					{
-						//cout << "This is empty" << endl;
-						Mix_Music *plant = Mix_LoadMUS("img/plant.wav");
-						if(Mix_PlayMusic(plant, 1) == -1)
-						{
-							printf(".WAV sound could not be played!\n"
-									"SDL_Error: %s\n", SDL_GetError());
-						}
-						newplant = new Plant(renderer,"img/HoneyshroomsStage_",3,1000,px,py);
-						plants.push_back(newplant);
-						plantTrigger = true;
-					}
-					else
-					{
-						//cout << "This is not empty" << endl;
-						bool plantArea = true;
-						for (auto &h : plants) {
-							if( ((px < h->getPlantpx() + 70 && px > h->getPlantpx() - 70) && 
-								(py < h->getPlantpy() + 55 && py > h->getPlantpy() - 55)) )
-							{
-								//cout << "px " << px << " < getPx+55 " << h->getPlantpx() + 55 << " px " << px << " > getPx-55 " << h->getPlantpx() - 55 << endl;
-								//cout << "py " << py << " < getPy+70 " << h->getPlantpy() + 70 << " py " << py << " > getPy-70 " << h->getPlantpy() - 70 << endl;
-								plantArea = false;
-							}
-						}
-						if(plantArea == true)
-						{
-							Mix_Music *plant = Mix_LoadMUS("img/plant.wav");
-							if(Mix_PlayMusic(plant, 1) == -1)
-							{
-								printf(".WAV sound could not be played!\n"
-										"SDL_Error: %s\n", SDL_GetError());
-							}
-							newplant = new Plant(renderer,"img/HoneyshroomsStage_",3,1000,px,py);
-							plants.push_back(newplant);
-							plantTrigger = true;
-							//cout << "Plant Spawned" << endl;
-						}
-						else
-						{
-							plantArea = true;
-							//cout << "Plant did Not Spawn" << endl;
-						}
-					}
-				}
-			}
-			if (e.key.keysym.sym==SDLK_q)
-			{
-				Mix_Music *plant = Mix_LoadMUS("img/water.wav");
-				if(Mix_PlayMusic(plant, 1) == -1)
-				{
-					printf(".WAV sound could not be played!\n"
-							"SDL_Error: %s\n", SDL_GetError());
-				}
-				for (auto &h : plants) {
-					if( (px < h->getPlantpx() + 30 && px > h->getPlantpx() - 30) && 
-						(py < h->getPlantpy() + 20 && py > h->getPlantpy() - 20))
-					{
-						h->setWatered(true);
-						plantWaterTrigger = true;
-					}
-				}
-			}
-			//cout << filename << endl;
-			//cout << px << endl;
-			//cout << py << endl;    
-		}
-		if (px<minX && minX!=-1) px=0;
-		if (px>maxX && maxX!=-1) px=640;
-		if (py<minY && minY!=-1) py=60;
-		if (py>maxY && maxY!=-1) py=480;
-
-		//return filename;
-	}
-	~Player() {
-	}
-};
-
-class Particle:public Sprite{  // Physics
-	double vx,vy,ax,ay;
-	public:
-	Particle(SDL_Renderer *newRenderer,string filename,
-	  double newPx=0.0,double newPy=0.0,
-	  double newVx=0.0,double newVy=0.0,
-	  double newAx=0.0,double newAy=0.0):Sprite(newRenderer,filename,newPx,newPy){
-		vx=newVx;
-		vy=newVy;
-		ax=newAx;
-		ay=newAy;	
-	}
-	void loop(int millis) {
-		double dt=((float)millis)/1000.0; // Should this be in ProtoGame
-        px+=vx*dt;
-        py+=vy*dt;
-        vx+=ax*dt;
-        vy+=ay*dt;
-        if (px>=640 || px<0) vx=-vx;
-        if (py>=150 || py<0) vy=-vy;
-        Sprite::loop(millis);
-	}
-	~Particle() {
-	}
-};
 
 class Game:public ProtoGame {
 	vector<Sprite *> sprites;
 	Player *p;
 	Sprite *background;
 	Sprite *ground;
-	//Text *t;
 	//string filename = "img/player.bmp";
 	public:
 	Game():ProtoGame("Space Game",640,480,10){  // Size,Seed
-
-		//SDL_Delay(5000);
-		//SDL_PumpEvents();
-
 		background = new Sprite(renderer, "img/morning_0.bmp");
 		sprites.push_back(background);
 		sprites.push_back(new Animation(renderer,"img/morning_",7,1000,0,0));
@@ -514,10 +55,17 @@ class Game:public ProtoGame {
 	    p=new Player(renderer,filename,60.0,60.0);
 	    p->setBounds(0,w,60,h);
 	    sprites.push_back(p);
+		
+		//Render text
 
-		SDL_RenderCopy(renderer, texture, NULL, &dstrect);
-		SDL_RenderPresent(renderer);
 
+	    // Start the Dear ImGui frame
+
+
+        // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
+
+        
+		
 		Mix_Chunk *waves=mm.readWAV("img/earthshine.mp3");
 	    if(Mix_PlayChannel(-1, waves, -1) == -1)
 		{
@@ -534,8 +82,18 @@ class Game:public ProtoGame {
 		}
 	}
 	void loop(int millis) {
+		ImGui_ImplSDLRenderer_NewFrame();
+        ImGui_ImplSDL2_NewFrame();
+        ImGui::NewFrame();
+		if (show_demo_window)
+            ImGui::ShowDemoWindow(&show_demo_window);
+		//ImGui::EndFrame();
+		ImGui::Render();
+        SDL_SetRenderDrawColor(renderer, (Uint8)(clear_color.x * 255), (Uint8)(clear_color.y * 255), (Uint8)(clear_color.z * 255), (Uint8)(clear_color.w * 255));
 		SDL_RenderClear(renderer);
         for (auto p:sprites) p->loop(millis);
+		ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+		SDL_RenderCopy(renderer, texture, NULL, &dstrect);
         SDL_RenderPresent(renderer);
 	}
     ~Game() {
