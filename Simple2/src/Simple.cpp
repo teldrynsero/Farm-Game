@@ -24,6 +24,8 @@ using namespace std;
 
 bool show_demo_window = true;
 bool show_another_window = false;
+bool my_tool_active = true;
+bool show_journal = false;
 ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 string filename = "img/player_0.bmp";
 
@@ -59,16 +61,6 @@ class Game:public ProtoGame {
 	    p->setBounds(0,w,60,h);
 	    sprites.push_back(p);
 		
-		//Render text
-
-
-	    // Start the Dear ImGui frame
-
-
-        // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-
-        
-		
 		Mix_Chunk *waves=mm.readWAV("img/earthshine.mp3");
 	    if(Mix_PlayChannel(-1, waves, -1) == -1)
 		{
@@ -88,9 +80,53 @@ class Game:public ProtoGame {
 		ImGui_ImplSDLRenderer_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
-		if (show_demo_window)
-            ImGui::ShowDemoWindow(&show_demo_window);
-		//ImGui::EndFrame();
+		{
+			ImGui::Begin("Welcome", &my_tool_active, ImGuiWindowFlags_MenuBar);
+			if (ImGui::BeginMenuBar())
+			{
+				if (ImGui::BeginMenu("Menu"))
+				{
+					if (ImGui::MenuItem("Settings", "Ctrl+O")) { /* Do stuff */ }
+					if (ImGui::MenuItem("Save", "Ctrl+S"))   { /* Do stuff */ }
+					if (ImGui::MenuItem("Close", "Ctrl+W"))  { my_tool_active = false; }
+					ImGui::EndMenu();
+				}
+				ImGui::EndMenuBar();
+			}
+
+            ImGui::Text("Welcome to Space Game.");               // Display some text (you can use a format strings too)
+            //ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
+			if (ImGui::Button("Tutorial"))
+                show_another_window = true;
+			if (ImGui::Button("Journal"))
+                show_journal = true;
+
+			ImGui::TextColored(ImVec4(1,1,0,1), "Inventory");
+			ImGui::BeginChild("Scrolling");
+			for (int n = 1; n < 51; n++)
+				ImGui::Text("%02d: Sample Item", n);
+			ImGui::EndChild();
+
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+            ImGui::End();
+        }
+        if (show_another_window)
+        {
+            ImGui::Begin("Tutorial", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+            ImGui::Text("Use the WASD keys to move.\nPress E to plant crops.\nPress Q to water them.");
+            if (ImGui::Button("Done"))
+                show_another_window = false;
+            ImGui::End();
+        }
+		if (show_journal)
+        {
+            ImGui::Begin("Journal", &show_journal);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+            ImGui::Text("Day 1\nI have crash landed on an unknown alien planet. I wonder if it is inhabited?");
+            ImGui::End();
+        }
+		//if (show_demo_window)
+        //    ImGui::ShowDemoWindow(&show_demo_window);
+
 		ImGui::Render();
         SDL_SetRenderDrawColor(renderer, (Uint8)(clear_color.x * 255), (Uint8)(clear_color.y * 255), (Uint8)(clear_color.z * 255), (Uint8)(clear_color.w * 255));
 		SDL_RenderClear(renderer);
