@@ -1,0 +1,6 @@
+Buy and Sell Items
+Plant Crops Not on Face DONE
+Create more plants
+Switch Between Crops DONE
+Harvesting Crops
+Create Main Menu and Quit Screen

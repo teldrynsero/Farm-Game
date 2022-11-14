@@ -6,6 +6,7 @@ class Plant:public Sprite {
 	long currentTime;
 	unsigned int framesNeeded;
 	unsigned current = 0;
+	bool fullyGrown;
 	public:
 	Plant(SDL_Renderer *newRenderer,string filename,int frames=1,int millisPerFrame=100,double newPx=0.0,double newPy=0.0) 
 	  :Sprite(newRenderer,filename+"0.bmp",newPx,newPy){
@@ -41,7 +42,11 @@ class Plant:public Sprite {
 		cout << current << "djjjjjjj" << endl;*/
 		//cout << framesNeeded << endl;
 		//cout << images.size() << endl;
-		if(current <= framesNeeded)
+		if(current == framesNeeded)
+		{
+			fullyGrown = true;
+		}
+		if(current < framesNeeded)
 		{
 			if(watered == true)
 			{
@@ -64,6 +69,8 @@ class Plant:public Sprite {
 				}
 			}
 		}
+		//cout << "Current " << current << " FraesNeeded " << framesNeeded << endl;
+		
 
 	}
 	int getPlantpx(){
@@ -71,6 +78,9 @@ class Plant:public Sprite {
 	}
 	int getPlantpy(){
 		return py;
+	}
+	bool isFullyGrown(){
+		return fullyGrown;
 	}
 };
 

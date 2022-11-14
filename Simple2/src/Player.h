@@ -186,12 +186,29 @@ class Player:public Sprite { // keyboard makes you move around
 			printf(".WAV sound could not be played!\n"
 					"SDL_Error: %s\n", SDL_GetError());
 		}
-		for (auto &h : plants) {
+		/*for (auto &h : plants) {
 			if( (px+horizontal < h->getPlantpx() + 30 && px+horizontal > h->getPlantpx() - 30) && 
 				(py+vertical < h->getPlantpy() + 20 && py+vertical > h->getPlantpy() - 20))
 			{
+				if(h->isFullyGrown() == true){
+					plants.erase(h);
+				}
 				h->setWatered(true);
 				plantWaterTrigger = true;
+			}
+		}*/
+		for(long long unsigned int i = 0; i < plants.size(); i++){
+			if( (px+horizontal < plants[i]->getPlantpx() + 30 && px+horizontal > plants[i]->getPlantpx() - 30) && 
+				(py+vertical < plants[i]->getPlantpy() + 20 && py+vertical > plants[i]->getPlantpy() - 20))
+			{
+				if(plants[i]->isFullyGrown() == true){
+					cout << "FULLYGROWN" << endl;
+					plants.erase(plants.begin()+i);
+				}else{
+					cout << "NOT FULLYGROWN" << endl;
+					plants[i]->setWatered(true);
+					plantWaterTrigger = true;
+				}
 			}
 		}
 	}
