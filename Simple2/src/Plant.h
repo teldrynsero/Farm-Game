@@ -76,3 +76,18 @@ class Plant:public Sprite {
 
 vector<Plant *> plants;
 Plant *newplant;
+
+struct plantName
+{
+	string namePlant;
+	string plantFilename;
+};
+vector<plantName> plantNames;
+int plantIndex = 0;
+void setPlantName(string Xname, string Xfilename)
+{
+	plantNames.push_back(plantName());
+	plantNames[plantIndex].namePlant = Xname;
+	plantNames[plantIndex].plantFilename = Xfilename;
+	plantIndex++;
+}

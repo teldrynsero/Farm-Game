@@ -52,6 +52,9 @@ class Game:public ProtoGame {
 		  double ay=10.0;
 		  sprites.push_back(new Particle(renderer,"img/star.bmp",10,10,vx,vy,ax,ay));
 	    } 
+
+		setPlantName("HoneyShrooms", "img/HoneyshroomsStage_");
+
 	    p=new Player(renderer,filename,60.0,60.0);
 	    p->setBounds(0,w,60,h);
 	    sprites.push_back(p);
