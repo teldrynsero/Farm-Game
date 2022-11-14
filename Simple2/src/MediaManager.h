@@ -1,5 +1,9 @@
 #pragma once
 
+#include <string>
+
+using namespace std;
+
 class MediaManager {
 	map<string,TextureInfo> images;
 	public:
