@@ -1,56 +1,64 @@
-SDLCFLAGS=-I/usr/include/SDL2 -D_REENTRANT
-SDLLIBS=-lSDL2
-# This path would need to change for every developer
-#WINLOC=C:/Users/kayle/Desktop/Build
-# Environment Variable GAMELOC is set in the development environment
-WINLOC=$(GAMELOC)
-SDLCFLAGS=-IC:\SDL2\include\SDL2 -Dmain=SDL_main
-SDLLIBS=-LC:\SDL2\lib -lmingw32 -lSDL2main -lSDL2 -lSDL2_mixer -lSDL2_ttf
+# If your entire team has sdl2-config working via make you could 
+# eliminate the ifeq's below and then uncomment the two lines below.
+
+#SDLCFLAGS=`sdl2-config --cflags`
+#SDLLIBS=`sdl2-config --libs`
+
+ifeq ($(OS),Windows_NT) 
+	USER:=$(shell whoami)
+	ifeq ($(USER),desktop-r562qc4\kamja)
+		SDLCFLAGS=-IC:\msys64\mingw64\include\SDL2 -Dmain=SDL_main
+		SDLLIBS=-LC:\msys64\mingw64\lib -lmingw32 -mwindows -lSDL2main -lSDL2  -lSDL2_mixer -lSDL2_ttf
+		GCC=C:\msys64\mingw64\bin\g++.exe
+	endif
+#	run whoami in cmd, copy/paste after $(USER),
+
+#	Your flags should look something like below
+#	WINLOC=$(GAMELOC)
+#	SDLCFLAGS=-I$(WINLOC)/msys2/mingw64/include/SDL2/ -Dmain=SDL_main
+#	SDLLIBS=-L$(WINLOC)/msys2/mingw64/lib/ -lmingw32 -mwindows -lSDL2main -lSDL2
+else
+	UNAME:=$(shell uname)
+	GCC=g++
+	ifeq ($(findstring OS,$(UNAME)),OS)
+		SDLCFLAGS=-I/usr/include/SDL2 -D_REENTRANT
+		SDLLIBS=-lSDL2  -lSDL2_mixer
+	endif
+
+	ifeq ($(UNAME),Linux)
+		SDLCFLAGS=-I/usr/include/SDL2 -D_REENTRANT
+		SDLLIBS=-lSDL2 -lSDL2_mixer
+	endif
+endif
 
 SRCDIR=src
-#IMGUI_DIR = ../..
-SOURCES = $(SRCDIR)/Simple.cpp $(SRCDIR)/Exception.cpp $(SRCDIR)/imgui.cpp $(SRCDIR)/imgui_demo.cpp $(SRCDIR)/imgui_draw.cpp $(SRCDIR)/imgui_tables.cpp $(SRCDIR)/imgui_widgets.cpp $(SRCDIR)/imgui_impl_sdl.cpp $(SRCDIR)/imgui_impl_sdlrenderer.cpp $(SRCDIR)/imgui_stdlib.cpp
-#SOURCES += /msys64/mingw64/include/imgui/imgui.cpp /msys64/mingw64/include/imgui/mgui_demo.cpp /msys64/mingw64/include/imgui/imgui_draw.cpp /msys64/mingw64/include/imgui/imgui_tables.cpp /msys64/mingw64/include/imgui/imgui_widgets.cpp
-#SOURCES += /msys64/mingw64/include/imgui/backends/imgui_impl_sdl.cpp /msys64/mingw64/include/imgui/backends/imgui_impl_sdlrenderer.cpp
-OBJS = $(addsuffix .o, $(basename $(notdir $(SOURCES))))
+SRCS=$(SRCDIR)/Simple.cpp $(SRCDIR)/Exception.cpp $(SRCDIR)/imgui.cpp $(SRCDIR)/imgui_demo.cpp $(SRCDIR)/imgui_draw.cpp $(SRCDIR)/imgui_tables.cpp $(SRCDIR)/imgui_widgets.cpp $(SRCDIR)/imgui_impl_sdl.cpp $(SRCDIR)/imgui_impl_sdlrenderer.cpp $(SRCDIR)/imgui_stdlib.cpp
+EXE=$(BUILDDIR)/Simple.exe
+SCRIPTS=Simple.sh Simple.bat
 
-Simple.exe: $(SOURCES)
-	g++ -std=c++17 $(SOURCES) -IC:\SDL2\include\SDL2 -LC:\SDL2\lib -Wall -lmingw32 -lSDL2main -lSDL2 -lSDL2_mixer -lSDL2_ttf -o Simple
+MEDIADIR=img
+MEDIA=$(MEDIADIR)/earthshine.mp3  $(MEDIADIR)/farmland.bmp  $(MEDIADIR)/ground.bmp \
+$(MEDIADIR)/HoneyshroomsStage_0.bmp  $(MEDIADIR)/HoneyshroomsStage_1.bmp  $(MEDIADIR)/HoneyshroomsStage_2.bmp \
+$(MEDIADIR)/morning_0.bmp  $(MEDIADIR)/morning_1.bmp $(MEDIADIR)/morning_2.bmp \
+$(MEDIADIR)/morning_3.bmp  $(MEDIADIR)/morning_4.bmp  $(MEDIADIR)/morning_5.bmp \
+$(MEDIADIR)/morning_6.bmp  $(MEDIADIR)/morning_7.bmp  $(MEDIADIR)/Pixeled.ttf \
+$(MEDIADIR)/plant.wav  $(MEDIADIR)/player_0.bmp  $(MEDIADIR)/player_1.bmp \
+$(MEDIADIR)/player_2.bmp  $(MEDIADIR)/player_3.bmp  $(MEDIADIR)/spritesheet.bmp \
+$(MEDIADIR)/star.bmp  $(MEDIADIR)/water.wav
 
-Simple: $(SRCS)
-	g++ -g -Wall $(SDLCFLAGS) -o $@ $? $(SDLLIBS)
+BUILDDIR=build
+BUILDFILES=Makefile
 
-clean: 
-	rm Simple.exe Simple
+$(EXE): $(SRCS)
+	$(GCC) -g -Wall $(SDLCFLAGS) -o $@ $+ $(SDLLIBS)
 
+Simple.zip: $(SRCS) $(HEADERS) $(MEDIA) $(BUILDFILES) $(SCRIPTS)
+	zip Simple.zip $+
 
-
-# cl /Zi /MD /I.. /I..\.. /I/msys64/mingw64/include/SDL2\include main.cpp ..\..\backends\imgui_impl_sdl.cpp ..\..\backends\imgui_impl_sdlrenderer.cpp ..\..\imgui*.cpp /FeDebug/example_sdl_sdlrenderer.exe /FoDebug/ /link /libpath:/msys64/mingw64/lib SDL2.lib SDL2main.lib /subsystem:console
-SDLCFLAGS=-I/usr/include/SDL2 -D_REENTRANT
-SDLLIBS=-lSDL2
-# This path would need to change for every developer
-#WINLOC=C:/Users/kayle/Desktop/Build
-# Environment Variable GAMELOC is set in the development environment
-WINLOC=$(GAMELOC)
-WINSDLCFLAGS=-I$(WINLOC)/msys2/mingw64/include/SDL2/ -Dmain=SDL_main
-WINSDLLIBS=-L$(WINLOC)/msys2/mingw64/lib/ -lmingw32 -mwindows -lSDL2main -lSDL2
-
-SRCDIR=src
-#IMGUI_DIR = ../..
-SOURCES = $(SRCDIR)/Simple.cpp $(SRCDIR)/Exception.cpp $(SRCDIR)/imgui.cpp $(SRCDIR)/imgui_demo.cpp $(SRCDIR)/imgui_draw.cpp $(SRCDIR)/imgui_tables.cpp $(SRCDIR)/imgui_widgets.cpp $(SRCDIR)/imgui_impl_sdl.cpp $(SRCDIR)/imgui_impl_sdlrenderer.cpp $(SRCDIR)/imgui_stdlib.cpp
-#SOURCES += /msys64/mingw64/include/imgui/imgui.cpp /msys64/mingw64/include/imgui/mgui_demo.cpp /msys64/mingw64/include/imgui/imgui_draw.cpp /msys64/mingw64/include/imgui/imgui_tables.cpp /msys64/mingw64/include/imgui/imgui_widgets.cpp
-#SOURCES += /msys64/mingw64/include/imgui/backends/imgui_impl_sdl.cpp /msys64/mingw64/include/imgui/backends/imgui_impl_sdlrenderer.cpp
-OBJS = $(addsuffix .o, $(basename $(notdir $(SOURCES))))
-
-Simple.exe: $(SOURCES)
-	g++ -std=c++17 $(SOURCES) -ID:/msys64/mingw64/include/SDL2 -LD:/msys64/mingw64/lib -Wall -lmingw32 -lSDL2main -lSDL2 -lSDL2_mixer -lSDL2_ttf -o Simple
-
-Simple: $(SRCS)
-	g++ -g -Wall $(SDLCFLAGS) -o $@ $? $(SDLLIBS)
+Deploy.zip: $(MEDIA) $(EXE) $(SCRIPTS)
+	zip Deploy.zip $+
 
 clean: 
-	rm Simple.exe Simple
+	rm $(BUILDDIR)/*
 
-
-
-# cl /Zi /MD /I.. /I..\.. /I/msys64/mingw64/include/SDL2\include main.cpp ..\..\backends\imgui_impl_sdl.cpp ..\..\backends\imgui_impl_sdlrenderer.cpp ..\..\imgui*.cpp /FeDebug/example_sdl_sdlrenderer.exe /FoDebug/ /link /libpath:/msys64/mingw64/lib SDL2.lib SDL2main.lib /subsystem:console
+all: $(EXE) Simple.zip Deploy.zip 
