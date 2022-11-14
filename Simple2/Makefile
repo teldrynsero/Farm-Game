@@ -5,12 +5,12 @@
 #SDLLIBS=`sdl2-config --libs`
 
 ifeq ($(OS),Windows_NT) 
-#	USER:=$(shell whoami)
-#	ifeq ($(USER),desktop-r562qc4\kamja)
-	SDLCFLAGS=-IC:\msys64\mingw64\include\SDL2 -Dmain=SDL_main
-	SDLLIBS=-LC:\msys64\mingw64\lib -lmingw32 -mwindows -lSDL2main -lSDL2  -lSDL2_mixer
-	GCC=C:\msys64\mingw64\bin\g++.exe
-#	endif
+	USER:=$(shell whoami)
+	ifeq ($(USER),desktop-r562qc4\kamja)
+		SDLCFLAGS=-IC:\msys64\mingw64\include\SDL2 -Dmain=SDL_main
+		SDLLIBS=-LC:\msys64\mingw64\lib -lmingw32 -mwindows -lSDL2main -lSDL2  -lSDL2_mixer -lSDL2_ttf
+		GCC=C:\msys64\mingw64\bin\g++.exe
+	endif
 #	run whoami in cmd, copy/paste after $(USER),
 
 #	Your flags should look something like below
@@ -32,10 +32,7 @@ else
 endif
 
 SRCDIR=src
-SRCS=$(SRCDIR)/Simple.cpp $(SRCDIR)/Exception.cpp
-HEADERS=$(SRCDIR)/Animation.h $(SRCDIR)/MediaManager.h $(SRCDIR)/Player.h \
-$(SRCDIR)/Sprite.h $(SRCDIR)/Exception.h  $(SRCDIR)/Particle.h \
-$(SRCDIR)/ProtoGame.h  $(SRCDIR)/TextureInfo.h
+SRCS=$(SRCDIR)/Simple.cpp $(SRCDIR)/Exception.cpp $(SRCDIR)/imgui.cpp $(SRCDIR)/imgui_demo.cpp $(SRCDIR)/imgui_draw.cpp $(SRCDIR)/imgui_tables.cpp $(SRCDIR)/imgui_widgets.cpp $(SRCDIR)/imgui_impl_sdl.cpp $(SRCDIR)/imgui_impl_sdlrenderer.cpp $(SRCDIR)/imgui_stdlib.cpp
 EXE=$(BUILDDIR)/Simple.exe
 SCRIPTS=Simple.sh Simple.bat
 
