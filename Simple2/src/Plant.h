@@ -7,14 +7,14 @@ class Plant:public Sprite {
 	unsigned int framesNeeded;
 	unsigned current = 0;
 	public:
-	Plant(SDL_Renderer *newRenderer,string filename,int frames=1,int millisPerFrame=100,double newPx=0.0,double newPy=0.0) 
-	  :Sprite(newRenderer,filename+"0.bmp",newPx,newPy){
+	Plant(SDL_Renderer *newRenderer,string filename,int frames=1,int millisPerFrame=100,double newPx=0.0,double newPy=0.0,int sprX=0,int sprY=0,int sprW=0,int sprH=0) 
+	  :Sprite(newRenderer,filename+"0.bmp",newPx,newPy,sprX,sprY,sprW,sprH){
 		images.push_back(AnimationFrame(image,millisPerFrame));
 		totalTime=millisPerFrame;
 		framesNeeded = frames;
 		watered = false;
 		for (int i=1;i<frames;i++) {
-			SDL_Texture *t=mm.read(renderer,filename+to_string(i)+".bmp",SrcR);
+			SDL_Texture *t=mm.read(renderer,filename+to_string(i)+".bmp",SrcR,sprX,sprY,sprW,sprH);
 			images.push_back(AnimationFrame(t,millisPerFrame));
 			totalTime+=millisPerFrame;
 			//cout << filename << i << ".bmp" << endl;

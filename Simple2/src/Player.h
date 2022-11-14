@@ -12,7 +12,7 @@ class Player:public Sprite { // keyboard makes you move around
 
 	public:
 	Player(SDL_Renderer *newRenderer,string filename,
-	  double newPx=0.0,double newPy=0.0):Sprite(newRenderer,filename,newPx,newPy) {
+	  double newPx=0.0,double newPy=0.0,int sprX=0,int sprY=0,int sprW=0,int sprH=0):Sprite(newRenderer,filename,newPx,newPy,sprX,sprY,sprW,sprH) {
 		  minX=-1;
 		  maxX=-1;
 		  minY=-1;
@@ -31,28 +31,28 @@ class Player:public Sprite { // keyboard makes you move around
 			{
 				px--;
 				filename = "img/player_2.bmp";
-				image=mm.read(renderer,filename,SrcR);
+				image=mm.read(renderer,filename,SrcR,0,0,70,110);
 				facingPosition = "Left";
 			}
 			if (e.key.keysym.sym==SDLK_w)
 			{
 				py--;
 				filename = "img/player_1.bmp";
-				image=mm.read(renderer,filename,SrcR);
+				image=mm.read(renderer,filename,SrcR,0,0,70,110);
 				facingPosition = "Up";
 			}
 			if (e.key.keysym.sym==SDLK_s)
 			{
 				py++;
 				filename = "img/player_0.bmp";
-				image=mm.read(renderer,filename,SrcR);
+				image=mm.read(renderer,filename,SrcR,0,0,70,110);
 				facingPosition = "Down";
 			}
 			if (e.key.keysym.sym==SDLK_d)
 			{
 				px++;
 				filename = "img/player_3.bmp";
-				image=mm.read(renderer,filename,SrcR);
+				image=mm.read(renderer,filename,SrcR,0,0,70,110);
 				facingPosition = "Right";
 			}
 			if (e.key.keysym.sym==SDLK_e)

@@ -8,9 +8,9 @@ class Sprite { // Just draw no physics or keyboard
 	double px,py;
 	bool watered;
 	public:
-	Sprite(SDL_Renderer *newRenderer,string filename,double newPx=0.0,double newPy=0.0) {
+	Sprite(SDL_Renderer *newRenderer,string filename,double newPx=0.0,double newPy=0.0,int sprX=0,int sprY=0,int sprW=0,int sprH=0) {
 		renderer=newRenderer;
-		image=mm.read(renderer,filename,SrcR);
+		image=mm.read(renderer,filename,SrcR,sprX,sprY,sprW,sprH);
 		//cout << "in class Sprite rendering " << filename << endl;
 		DestR=SrcR;
 		px=newPx;
