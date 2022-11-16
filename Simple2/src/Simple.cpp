@@ -25,7 +25,7 @@ using namespace std;
 bool show_demo_window = true;
 bool show_another_window = false;
 ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-string filename = "img/player_0.bmp";
+string filename = "img/spritesheet.bmp";
 
 class Game:public ProtoGame {
 	vector<Sprite *> sprites;
@@ -55,7 +55,7 @@ class Game:public ProtoGame {
 
 		setPlantName("HoneyShrooms", "img/HoneyshroomsStage_");
 
-	    p=new Player(renderer,filename,60.0,60.0);
+	    p=new Player(renderer,filename,60.0,60.0,0,0,70,110);
 	    p->setBounds(0,w,60,h);
 	    sprites.push_back(p);
 		

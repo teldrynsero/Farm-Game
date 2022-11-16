@@ -8,9 +8,9 @@ class MediaManager {
 	map<string,TextureInfo> images;
 	public:
 	SDL_Texture *read(SDL_Renderer *renderer,string filename,SDL_Rect &SrcR,int sprX,int sprY,int sprW,int sprH) {
+	 	SDL_Texture *image=NULL;
+		SDL_Surface *bitmapSurface = NULL;
 		if (images.find(filename)==images.end()) {
-	 	  SDL_Texture *image=NULL;
-		  SDL_Surface *bitmapSurface = NULL;
 		  bitmapSurface = SDL_LoadBMP(filename.c_str());
 		  SDL_SetColorKey(bitmapSurface,SDL_TRUE,SDL_MapRGB(bitmapSurface->format,0,0,255));
 		  SrcR.x = sprX;
@@ -32,6 +32,10 @@ class MediaManager {
 		  return image;	
 	    }
 	  TextureInfo texture=images[filename];
+	  SrcR.x = sprX;
+	  SrcR.y = sprY;
+	  SrcR.w = sprW;
+	  SrcR.h = sprH;
 	  SrcR=texture.srcRect;  
 	  return texture.texture;// find and return second
 	}
