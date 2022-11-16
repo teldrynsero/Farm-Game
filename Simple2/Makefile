@@ -19,7 +19,8 @@ ifeq ($(OS),Windows_NT)
 	ifeq ($(USER),kayle)
 	SDLCFLAGS=-ID:/msys64/mingw64/include/SDL2 -Dmain=SDL_main
 	SDLLIBS=-LD:/msys64/mingw64/lib -lmingw32 -mwindows -lSDL2main -lSDL2 -lSDL2_mixer -lSDL2_ttf
-	GCC=g++ -std=c++17
+	GCC=g++
+	endif
 #	run whoami in cmd, copy/paste after $(USER),
 
 #	Your flags should look something like below
