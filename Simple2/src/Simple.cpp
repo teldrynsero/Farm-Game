@@ -34,6 +34,7 @@ class Game:public ProtoGame {
 	Player *p;
 	Sprite *background;
 	Sprite *ground;
+	Sprite *npc;
 	//string filename = "img/player.bmp";
 	public:
 	Game():ProtoGame("Space Game",640,480,10){  // Size,Seed
@@ -42,6 +43,8 @@ class Game:public ProtoGame {
 		sprites.push_back(new Animation(renderer,"img/morning_",7,1000,0,0));
 		ground = new Sprite(renderer, "img/ground.bmp");
 		sprites.push_back(ground);
+		npc = new Sprite(renderer, "img/npc.bmp");
+		sprites.push_back(npc);
 		sprites.push_back(new Animation(renderer,"img/HoneyshroomsStage_",3,1000,500,300));
 		//double sx=getW()/2.0;
 		//double sy=getH()/2.0;
