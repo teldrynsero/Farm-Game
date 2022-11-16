@@ -9,10 +9,14 @@ class Player:public Sprite { // keyboard makes you move around
 	string facingPosition;
 	int plantFileIndex = 0;
 	string filenamePlant = "img/player_";
+	int StageNum = 1;
+	int pricePlant = 0;
+	int PlayerWallet = 0;
+	int HoldingPrice;
 
 	public:
 	Player(SDL_Renderer *newRenderer,string filename,
-	  double newPx=0.0,double newPy=0.0):Sprite(newRenderer,filename,newPx,newPy) {
+	  double newPx=0.0,double newPy=0.0,int sprX=0,int sprY=0,int sprW=0,int sprH=0):Sprite(newRenderer,filename,newPx,newPy,sprX,sprY,sprW,sprH) {
 		  minX=-1;
 		  maxX=-1;
 		  minY=-1;
@@ -31,32 +35,42 @@ class Player:public Sprite { // keyboard makes you move around
 			{
 				px--;
 				filename = "img/player_2.bmp";
-				image=mm.read(renderer,filename,SrcR);
+				image=mm.read(renderer,filename,SrcR,0,0,70,110);
 				facingPosition = "Left";
 			}
 			if (e.key.keysym.sym==SDLK_w)
 			{
 				py--;
 				filename = "img/player_1.bmp";
-				image=mm.read(renderer,filename,SrcR);
+				image=mm.read(renderer,filename,SrcR,0,0,70,110);
 				facingPosition = "Up";
 			}
 			if (e.key.keysym.sym==SDLK_s)
 			{
 				py++;
 				filename = "img/player_0.bmp";
-				image=mm.read(renderer,filename,SrcR);
+				image=mm.read(renderer,filename,SrcR,0,0,70,110);
 				facingPosition = "Down";
 			}
 			if (e.key.keysym.sym==SDLK_d)
 			{
 				px++;
 				filename = "img/player_3.bmp";
-				image=mm.read(renderer,filename,SrcR);
+				image=mm.read(renderer,filename,SrcR,0,0,70,110);
 				facingPosition = "Right";
 			}
 			if (e.key.keysym.sym==SDLK_e)
 			{
+
+				cout << "px " << px << " py " << py << endl;
+				if((px < 640 && px > 640-70) && (py < 150 && py > 150-55))
+				{
+					PlayerWallet += HoldingPrice;
+					HoldingPrice = 0;
+					cout << "PlayerWallet " << PlayerWallet << endl;
+					cout << "HoldingPrice After Depositing " << HoldingPrice << endl;
+				}
+
 				if(facingPosition == "Left")//52
 				{
 					PlayerPlanting(-35-28+1, 51);
@@ -100,6 +114,8 @@ class Player:public Sprite { // keyboard makes you move around
 				if(plantFileIndex < plantIndex-1)
 				{
 					filenamePlant = plantNames[plantFileIndex].plantFilename;
+					StageNum = plantNames[plantFileIndex].NumOfStages;
+					pricePlant = plantNames[plantFileIndex].plantPrice;
 					//cout << plantNames[plantFileIndex].namePlant << endl;
 					plantFileIndex++;
 					//cout << " If After " << plantFileIndex << endl;
@@ -107,6 +123,8 @@ class Player:public Sprite { // keyboard makes you move around
 				else
 				{
 					filenamePlant = plantNames[plantFileIndex].plantFilename;
+					StageNum = plantNames[plantFileIndex].NumOfStages;
+					pricePlant = plantNames[plantFileIndex].plantPrice;
 					//cout << plantNames[plantFileIndex].namePlant << endl;
 					//cout << "Else After " << plantFileIndex << endl;
 					plantFileIndex = 0;
@@ -137,7 +155,10 @@ class Player:public Sprite { // keyboard makes you move around
 					printf(".WAV sound could not be played!\n"
 							"SDL_Error: %s\n", SDL_GetError());
 				}
-				newplant = new Plant(renderer,filenamePlant,3,1000,px+horizontal,py+vertical);
+				//cout << filenamePlant << endl;
+				//cout << StageNum << endl;
+				//cout << pricePlant << endl;
+				newplant = new Plant(renderer,filenamePlant,StageNum,1000,px+horizontal,py+vertical, pricePlant);
 				plants.push_back(newplant);
 				plantTrigger = true;
 			}
@@ -165,7 +186,10 @@ class Player:public Sprite { // keyboard makes you move around
 						printf(".WAV sound could not be played!\n"
 								"SDL_Error: %s\n", SDL_GetError());
 					}
-					newplant = new Plant(renderer,filenamePlant,3,1000,px+horizontal,py+vertical);
+					//cout << filenamePlant << endl;
+					//cout << StageNum << endl;
+					//cout << pricePlant << endl;
+					newplant = new Plant(renderer,filenamePlant,StageNum,1000,px+horizontal,py+vertical, pricePlant);
 					plants.push_back(newplant);
 					plantTrigger = true;
 					//cout << "Plant Spawned" << endl;
@@ -186,26 +210,18 @@ class Player:public Sprite { // keyboard makes you move around
 			printf(".WAV sound could not be played!\n"
 					"SDL_Error: %s\n", SDL_GetError());
 		}
-		/*for (auto &h : plants) {
-			if( (px+horizontal < h->getPlantpx() + 30 && px+horizontal > h->getPlantpx() - 30) && 
-				(py+vertical < h->getPlantpy() + 20 && py+vertical > h->getPlantpy() - 20))
-			{
-				if(h->isFullyGrown() == true){
-					plants.erase(h);
-				}
-				h->setWatered(true);
-				plantWaterTrigger = true;
-			}
-		}*/
 		for(long long unsigned int i = 0; i < plants.size(); i++){
 			if( (px+horizontal < plants[i]->getPlantpx() + 30 && px+horizontal > plants[i]->getPlantpx() - 30) && 
 				(py+vertical < plants[i]->getPlantpy() + 20 && py+vertical > plants[i]->getPlantpy() - 20))
 			{
 				if(plants[i]->isFullyGrown() == true){
-					cout << "FULLYGROWN" << endl;
+					plants[i]->setWatered(true);
+					//cout << "FULLYGROWN" << endl;
+					HoldingPrice = plants[i]->getPrice();
+					cout << "HoldingPrice Before Depositing " << HoldingPrice << endl;
 					plants.erase(plants.begin()+i);
 				}else{
-					cout << "NOT FULLYGROWN" << endl;
+					//cout << "NOT FULLYGROWN" << endl;
 					plants[i]->setWatered(true);
 					plantWaterTrigger = true;
 				}

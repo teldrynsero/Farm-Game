@@ -7,16 +7,24 @@ using namespace std;
 class MediaManager {
 	map<string,TextureInfo> images;
 	public:
-	SDL_Texture *read(SDL_Renderer *renderer,string filename,SDL_Rect &SrcR) {
+	SDL_Texture *read(SDL_Renderer *renderer,string filename,SDL_Rect &SrcR,int sprX,int sprY,int sprW,int sprH) {
 		if (images.find(filename)==images.end()) {
 	 	  SDL_Texture *image=NULL;
 		  SDL_Surface *bitmapSurface = NULL;
 		  bitmapSurface = SDL_LoadBMP(filename.c_str());
 		  SDL_SetColorKey(bitmapSurface,SDL_TRUE,SDL_MapRGB(bitmapSurface->format,0,0,255));
-		  SrcR.x = 0;
-		  SrcR.y = 0;
-		  SrcR.w = bitmapSurface->w;
-		  SrcR.h = bitmapSurface->h;
+		  SrcR.x = sprX;
+		  SrcR.y = sprY;
+		  if(sprW==0 && sprH==0)
+		  {
+			SrcR.w = bitmapSurface->w;
+			SrcR.h = bitmapSurface->h;
+		  }
+		  else
+		  {
+			SrcR.w = sprW;
+			SrcR.h = sprH;
+		  }
 		  image = SDL_CreateTextureFromSurface(renderer, bitmapSurface);		
 		  SDL_FreeSurface(bitmapSurface);
 		  images[filename]=TextureInfo(image,SrcR); // should do an insert
