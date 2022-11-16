@@ -34,6 +34,8 @@ class Game:public ProtoGame {
 	Player *p;
 	Sprite *background;
 	Sprite *ground;
+	Sprite *npc;
+	Sprite *sellchest;
 	//string filename = "img/player.bmp";
 	public:
 	Game():ProtoGame("Space Game",640,480,10){  // Size,Seed
@@ -42,7 +44,10 @@ class Game:public ProtoGame {
 		sprites.push_back(new Animation(renderer,"img/morning_",7,1000,0,0));
 		ground = new Sprite(renderer, "img/ground.bmp");
 		sprites.push_back(ground);
+		npc = new Sprite(renderer, "img/npc.bmp");
+		sprites.push_back(npc);
 		sprites.push_back(new Animation(renderer,"img/HoneyshroomsStage_",3,1000,500,300));
+		sellchest = new Sprite(renderer, "sellchest.bmp", (640-(70/2)), (152-(55/2)));
 		//double sx=getW()/2.0;
 		//double sy=getH()/2.0;
 		for (int i=0;i<10;i++) { //  Initialize Level loop
@@ -56,6 +61,8 @@ class Game:public ProtoGame {
 	    } 
 
 		setPlantName("HoneyShrooms", "img/HoneyshroomsStage_", 3, 100);
+		setPlantName("Elaberries", "img/ElaberriesStage_", 4, 300);
+		setPlantName("Moonflowers", "img/MoonflowersStage_", 3, 1000);
 
 	    p=new Player(renderer,filename,60.0,60.0);
 	    p->setBounds(0,w,60,h);

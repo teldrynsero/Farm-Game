@@ -16,6 +16,11 @@ ifeq ($(OS),Windows_NT)
 		SDLLIBS=-LC:\SDL2\lib -lmingw32 -lSDL2main -lSDL2 -lSDL2_mixer -lSDL2_ttf
 		GCC=C:\msys64\mingw64\bin\g++.exe
 	endif
+	ifeq ($(USER),kayle)
+	SDLCFLAGS=-ID:/msys64/mingw64/include/SDL2 -Dmain=SDL_main
+	SDLLIBS=-LD:/msys64/mingw64/lib -lmingw32 -mwindows -lSDL2main -lSDL2 -lSDL2_mixer -lSDL2_ttf
+	GCC=g++ -std=c++17
+	endif
 #	run whoami in cmd, copy/paste after $(USER),
 
 #	Your flags should look something like below
@@ -42,8 +47,10 @@ EXE=$(BUILDDIR)/Simple.exe
 SCRIPTS=Simple.sh Simple.bat
 
 MEDIADIR=img
-MEDIA=$(MEDIADIR)/earthshine.mp3  $(MEDIADIR)/farmland.bmp  $(MEDIADIR)/ground.bmp \
+MEDIA=$(MEDIADIR)/earthshine.mp3  $(MEDIADIR)/farmland.bmp  $(MEDIADIR)/ground.bmp  $(MEDIADIR)/sellchest.bmp  $(MEDIADIR)/npc.bmp \
 $(MEDIADIR)/HoneyshroomsStage_0.bmp  $(MEDIADIR)/HoneyshroomsStage_1.bmp  $(MEDIADIR)/HoneyshroomsStage_2.bmp \
+$(MEDIADIR)/ElaberriesStage_0.bmp  $(MEDIADIR)/ElaberriesStage_1.bmp  $(MEDIADIR)/ElaberriesStage_2.bmp \ $(MEDIADIR)/ElaberriesStage_3.bmp \
+$(MEDIADIR)/MoonflowersStage_0.bmp  $(MEDIADIR)/MoonflowersStage_1.bmp  $(MEDIADIR)/MoonflowersStage_2.bmp \
 $(MEDIADIR)/morning_0.bmp  $(MEDIADIR)/morning_1.bmp $(MEDIADIR)/morning_2.bmp \
 $(MEDIADIR)/morning_3.bmp  $(MEDIADIR)/morning_4.bmp  $(MEDIADIR)/morning_5.bmp \
 $(MEDIADIR)/morning_6.bmp  $(MEDIADIR)/morning_7.bmp  $(MEDIADIR)/Pixeled.ttf \
