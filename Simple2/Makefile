@@ -41,6 +41,16 @@ else
 	endif
 endif
 
+#Ben's Compile
+
+UNAME := $(shell uname)
+ifeq ($(UNAME),Darwin) # MacOS 
+#		SDLCFLAGS=-I/opt/homebrew/include/SDL2 -D_THREAD_SAFE
+#		SDLLIBS=-L/opt/homebrew/lib -lSDL2 -lSDL2_mixer -lSDL2_ttf -lSDL2_main - lSDL2_image
+		SDLCFLAGS=`sdl2-config --cflags`
+		SDLLIBS=`sdl2-config --libs` -lSDL2_mixer -lSDL2_ttf -lSDL2_image
+endif
+
 SRCDIR=src
 SRCS=$(SRCDIR)/Simple.cpp $(SRCDIR)/Exception.cpp $(SRCDIR)/imgui.cpp $(SRCDIR)/imgui_demo.cpp $(SRCDIR)/imgui_draw.cpp $(SRCDIR)/imgui_tables.cpp $(SRCDIR)/imgui_widgets.cpp $(SRCDIR)/imgui_impl_sdl.cpp $(SRCDIR)/imgui_impl_sdlrenderer.cpp $(SRCDIR)/imgui_stdlib.cpp
 EXE=$(BUILDDIR)/Simple.exe
@@ -63,6 +73,9 @@ BUILDFILES=Makefile
 
 $(EXE): $(SRCS)
 	$(GCC) -g -Wall $(SDLCFLAGS) -o $@ $+ $(SDLLIBS)
+
+run: $(EXE)
+	./$(EXE)
 
 Simple.zip: $(SRCS) $(HEADERS) $(MEDIA) $(BUILDFILES) $(SCRIPTS)
 	zip Simple.zip $+
