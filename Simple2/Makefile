@@ -86,4 +86,7 @@ Deploy.zip: $(MEDIA) $(EXE) $(SCRIPTS)
 clean: 
 	rm $(BUILDDIR)/*
 
+cleanExe:
+	rm $(EXE)
+
 all: $(EXE) Simple.zip Deploy.zip 
