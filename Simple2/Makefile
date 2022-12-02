@@ -48,7 +48,7 @@ ifeq ($(UNAME),Darwin) # MacOS
 #		SDLCFLAGS=-I/opt/homebrew/include/SDL2 -D_THREAD_SAFE
 #		SDLLIBS=-L/opt/homebrew/lib -lSDL2 -lSDL2_mixer -lSDL2_ttf -lSDL2_main - lSDL2_image
 		SDLCFLAGS=`sdl2-config --cflags`
-		SDLLIBS=`sdl2-config --libs` -lSDL2_mixer -lSDL2_ttf -lSDL2_image
+		SDLLIBS=`sdl2-config --libs` -lSDL2_mixer -lSDL2_ttf -lSDL2_imgui
 endif
 
 SRCDIR=src
