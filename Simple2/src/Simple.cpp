@@ -35,10 +35,12 @@ class Game:public ProtoGame {
 	Sprite *background;
 	Sprite *ground;
 	Sprite *npc;
-	Sprite *sellchest;
+	Sprite *start;
+	//Sprite *sellchest;
 	//string filename = "img/player.bmp";
 	public:
 	Game():ProtoGame("Space Game",640,480,10){  // Size,Seed
+
 		background = new Sprite(renderer, "img/morning_0.bmp");
 		sprites.push_back(background);
 		sprites.push_back(new Animation(renderer,"img/morning_",7,1000,0,0));
@@ -47,7 +49,7 @@ class Game:public ProtoGame {
 		npc = new Sprite(renderer, "img/npc.bmp");
 		sprites.push_back(npc);
 		sprites.push_back(new Animation(renderer,"img/HoneyshroomsStage_",3,1000,500,300));
-		sellchest = new Sprite(renderer, "sellchest.bmp", (640-(70/2)), (152-(55/2)));
+		//sellchest = new Sprite(renderer, "sellchest.bmp", (640-(70/2)), (152-(55/2)));
 		//double sx=getW()/2.0;
 		//double sy=getH()/2.0;
 		for (int i=0;i<10;i++) { //  Initialize Level loop
@@ -67,6 +69,9 @@ class Game:public ProtoGame {
 	    p=new Player(renderer,filename,60.0,60.0);
 	    p->setBounds(0,w,60,h);
 	    sprites.push_back(p);
+
+		//start = new Sprite(renderer, "img/startscreen.bmp");
+		//sprites.push_back(start);
 		
 		Mix_Chunk *waves=mm.readWAV("img/earthshine.mp3");
 	    if(Mix_PlayChannel(-1, waves, -1) == -1)
@@ -82,6 +87,7 @@ class Game:public ProtoGame {
 			sprites.push_back(newplant);
 			plantTrigger = false;
 		}
+
 	}
 	void loop(int millis) {
 		ImGui_ImplSDLRenderer_NewFrame();
@@ -91,23 +97,33 @@ class Game:public ProtoGame {
 			ImGui::Begin("Welcome", &my_tool_active, ImGuiWindowFlags_MenuBar);
 			if (ImGui::BeginMenuBar())
 			{
-				if (ImGui::BeginMenu("Menu"))
+				if (ImGui::BeginMenu("Choose Plant"))
 				{
-					if (ImGui::MenuItem("Settings", "Ctrl+O")) { /* Do stuff */ }
-					if (ImGui::MenuItem("Save", "Ctrl+S"))   { /* Do stuff */ }
-					if (ImGui::MenuItem("Close", "Ctrl+W"))  { my_tool_active = false; }
+					if (ImGui::MenuItem("HoneyShrooms", "100 rocks")) {
+						p->filenamePlant = plantNames[0].plantFilename;
+						p->StageNum = plantNames[0].NumOfStages;
+						p->pricePlant = plantNames[0].plantPrice;
+					}
+					if (ImGui::MenuItem("Elaberries", "300 rocks"))   {
+						p->filenamePlant = plantNames[1].plantFilename;
+						p->StageNum = plantNames[1].NumOfStages;
+						p->pricePlant = plantNames[1].plantPrice;
+					 }
+					if (ImGui::MenuItem("Moonflowers", "1000 rocks"))  {
+						p->filenamePlant = plantNames[2].plantFilename;
+						p->StageNum = plantNames[2].NumOfStages;
+						p->pricePlant = plantNames[2].plantPrice;
+					}
 					ImGui::EndMenu();
 				}
 				ImGui::EndMenuBar();
 			}
-
-            ImGui::Text("Welcome to Space Game.");               // Display some text (you can use a format strings too)
             //ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
 			if (ImGui::Button("Tutorial"))
                 show_another_window = true;
 			if (ImGui::Button("Journal"))
                 show_journal = true;
-
+			ImGui::Text("Wallet: ");               // Display some text (you can use a format strings too)
 			ImGui::TextColored(ImVec4(1,1,0,1), "Inventory");
 			ImGui::BeginChild("Scrolling");
 			for (int n = 1; n < 51; n++)
@@ -120,7 +136,7 @@ class Game:public ProtoGame {
         if (show_another_window)
         {
             ImGui::Begin("Tutorial", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-            ImGui::Text("Use the WASD keys to move.\nPress E to plant crops.\nPress Q to water them.");
+            ImGui::Text("Use the WASD keys to move.\nPress E to plant crops.\nPress Q to water them.\nOn the main menu,\nuse the drop down Choose Plant menu\nto select a plant you would\nlike to plant.");
             if (ImGui::Button("Done"))
                 show_another_window = false;
             ImGui::End();
@@ -138,6 +154,11 @@ class Game:public ProtoGame {
         SDL_SetRenderDrawColor(renderer, (Uint8)(clear_color.x * 255), (Uint8)(clear_color.y * 255), (Uint8)(clear_color.z * 255), (Uint8)(clear_color.w * 255));
 		SDL_RenderClear(renderer);
         for (auto p:sprites) p->loop(millis);
+		if(waterTrigger == true){
+			sprites.push_back(watering);
+			waterTrigger = false;
+			//sprites.pop_back();
+		}
 		ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
 		SDL_RenderCopy(renderer, texture, NULL, &dstrect);
         SDL_RenderPresent(renderer);
@@ -147,8 +168,22 @@ class Game:public ProtoGame {
 	}
 };
 
+/*
+class TitleScreen::public ProtoGame
+{
+	void loop()
+	{
+		const SDL_Event &e;
+		if (e.key.keysym.sym==SDLK_KP_ENTER)  
+		{
+			SDL_RenderClear(renderer);
+		}
+	}
+}
+*/
 int main(int argc, char *argv[])
 {
+	//TitleScreen t;
 	Game g;
 	g.doLoop();
     return 0;

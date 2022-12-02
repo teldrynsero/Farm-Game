@@ -1,8 +1,13 @@
 #pragma once
 
+vector<Sprite *> waterstuff;
+Sprite *watering;
+
+bool waterTrigger = false;
 bool plantTrigger = false;
 bool plantWaterTrigger = false;
 class Player:public Sprite { // keyboard makes you move around
+	public:
 	int minX,maxX,minY,maxY;
 
 	string filename;
@@ -14,7 +19,7 @@ class Player:public Sprite { // keyboard makes you move around
 	int PlayerWallet = 0;
 	int HoldingPrice;
 
-	public:
+	//public:
 	Player(SDL_Renderer *newRenderer,string filename,
 	  double newPx=0.0,double newPy=0.0,int sprX=0,int sprY=0,int sprW=0,int sprH=0):Sprite(newRenderer,filename,newPx,newPy,sprX,sprY,sprW,sprH) {
 		  minX=-1;
@@ -107,7 +112,7 @@ class Player:public Sprite { // keyboard makes you move around
 					PlayerWatering(35+28-1, 51);
 				}
 			}
-			if (e.key.keysym.sym==SDLK_f)
+			/* if (e.key.keysym.sym==SDLK_f)
 			{
 				//std::cout << "Before " << plantFileIndex << " Space " << plantIndex;
 				//std::cout.flush();
@@ -129,10 +134,10 @@ class Player:public Sprite { // keyboard makes you move around
 					//cout << "Else After " << plantFileIndex << endl;
 					plantFileIndex = 0;
 				}
-			}
+			} */
 			//cout << filename << endl;
 			//cout << px << endl;
-			//cout << py << endl;    
+			//cout << py << endl; 
 		}
 		if (px<minX && minX!=-1) px=0;
 		if (px>maxX && maxX!=-1) px=640;
@@ -141,9 +146,15 @@ class Player:public Sprite { // keyboard makes you move around
 
 		//return filename;
 	}
+	void selectPlant(int x)
+	{
+		filenamePlant = plantNames[x].plantFilename;
+		StageNum = plantNames[x].NumOfStages;
+		pricePlant = plantNames[x].plantPrice;
+	}
 	void PlayerPlanting(int horizontal, int vertical)
 	{
-		//cout << "THis is Happening" << endl;
+		//cout << "This is Happening" << endl;
 		if(plants.empty() == true)
 		{
 			if(py+vertical > 164)
@@ -204,6 +215,10 @@ class Player:public Sprite { // keyboard makes you move around
 	}
 	void PlayerWatering(int horizontal, int vertical)
 	{
+		watering = new Sprite(renderer,"img/watercan.bmp",px,py);
+		waterstuff.push_back(watering);
+		waterTrigger = true;
+		//plants.pop_back(watering);
 		Mix_Music *plant = Mix_LoadMUS("img/water.wav");
 		if(Mix_PlayMusic(plant, 1) == -1)
 		{
