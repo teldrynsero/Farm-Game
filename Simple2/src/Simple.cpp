@@ -36,11 +36,27 @@ class Game:public ProtoGame {
 	Sprite *ground;
 	Sprite *npc;
 	Sprite *start;
+	SDL_Event firstEvent;
+	//int SDL_WaitEvent(SDL_Event * event);
 	//Sprite *sellchest;
 	//string filename = "img/player.bmp";
 	public:
 	Game():ProtoGame("Space Game",640,480,10){  // Size,Seed
+		/* start = new Sprite(renderer, "img/startscreen.bmp");
+		sprites.push_back(start);
 
+		SDL_WaitEvent(&firstEvent);
+		switch (firstEvent.type) {
+			case SDL_KEYDOWN:
+				if (firstEvent.key.keysym.sym==SDLK_KP_ENTER)
+					SDL_PumpEvents();
+				//printf("The %s key was pressed!\n",
+					//SDL_GetKeyName(event.key.keysym.sym));
+				break;
+			case SDL_QUIT:
+				exit(0);
+   		}
+		*/ 
 		background = new Sprite(renderer, "img/morning_0.bmp");
 		sprites.push_back(background);
 		sprites.push_back(new Animation(renderer,"img/morning_",7,1000,0,0));
@@ -69,9 +85,6 @@ class Game:public ProtoGame {
 	    p=new Player(renderer,filename,60.0,60.0);
 	    p->setBounds(0,w,60,h);
 	    sprites.push_back(p);
-
-		//start = new Sprite(renderer, "img/startscreen.bmp");
-		//sprites.push_back(start);
 		
 		Mix_Chunk *waves=mm.readWAV("img/earthshine.mp3");
 	    if(Mix_PlayChannel(-1, waves, -1) == -1)
@@ -121,13 +134,17 @@ class Game:public ProtoGame {
             //ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
 			if (ImGui::Button("Tutorial"))
                 show_another_window = true;
+			ImGui::SameLine();
 			if (ImGui::Button("Journal"))
                 show_journal = true;
 			ImGui::Text("Wallet: ");               // Display some text (you can use a format strings too)
 			ImGui::TextColored(ImVec4(1,1,0,1), "Inventory");
 			ImGui::BeginChild("Scrolling");
+			//int n = 1;
+			//ImGui::Text("%02d: " + plantNames[0].namePlant, n)
 			for (int n = 1; n < 51; n++)
 				ImGui::Text("%02d: Sample Item", n);
+
 			ImGui::EndChild();
 
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
@@ -154,9 +171,9 @@ class Game:public ProtoGame {
         SDL_SetRenderDrawColor(renderer, (Uint8)(clear_color.x * 255), (Uint8)(clear_color.y * 255), (Uint8)(clear_color.z * 255), (Uint8)(clear_color.w * 255));
 		SDL_RenderClear(renderer);
         for (auto p:sprites) p->loop(millis);
-		if(waterTrigger == true){
+		if(plantWaterTrigger == true){
 			sprites.push_back(watering);
-			waterTrigger = false;
+			plantWaterTrigger = false;
 			//sprites.pop_back();
 		}
 		ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
@@ -169,18 +186,40 @@ class Game:public ProtoGame {
 };
 
 /*
-class TitleScreen::public ProtoGame
+class TitleScreen:public ProtoGame
 {
+	vector<Sprite *> sprites;
+	Player *p;
+	Sprite *title;
+	//Sprite *sellchest;
+	//string filename = "img/player.bmp";
+	public:
+	TitleScreen():ProtoGame("Space Game",640,480,10){  // Size,Seed
+		title = new Sprite(renderer, "img/startscreen.bmp");
+		sprites.push_back(title);
+
+
 	void loop()
 	{
 		const SDL_Event &e;
 		if (e.key.keysym.sym==SDLK_KP_ENTER)  
 		{
-			SDL_RenderClear(renderer);
+			Game g;
+			~TitleScreen();
 		}
+		SDL_RenderClear(renderer);
+		SDL_RenderCopy(renderer, texture, NULL, &dstrect);
+        SDL_RenderPresent(renderer);
+	}
+
+	~TitleScreen()
+	{
+		for (auto p:sprites) delete p;
 	}
 }
+}
 */
+
 int main(int argc, char *argv[])
 {
 	//TitleScreen t;

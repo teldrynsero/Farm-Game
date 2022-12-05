@@ -6,7 +6,7 @@ class Plant:public Sprite {
 	long currentTime;
 	unsigned int framesNeeded;
 	unsigned current = 0;
-	bool fullyGrown;
+	bool fullyGrown = false;
 	double price;
 	public:
 	Plant(SDL_Renderer *newRenderer,string filename,int frames=1,int millisPerFrame=100,double newPx=0.0,double newPy=0.0,double pricing=0.0,int sprX=0,int sprY=0,int sprW=0,int sprH=0) 
@@ -14,6 +14,7 @@ class Plant:public Sprite {
 		images.push_back(AnimationFrame(image,millisPerFrame));
 		totalTime=millisPerFrame;
 		framesNeeded = frames;
+		//cout << current << endl;
 		watered = false;
 		price = pricing;
 		for (int i=1;i<frames;i++) {

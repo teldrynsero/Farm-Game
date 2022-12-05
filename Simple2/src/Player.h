@@ -3,7 +3,6 @@
 vector<Sprite *> waterstuff;
 Sprite *watering;
 
-bool waterTrigger = false;
 bool plantTrigger = false;
 bool plantWaterTrigger = false;
 class Player:public Sprite { // keyboard makes you move around
@@ -134,7 +133,9 @@ class Player:public Sprite { // keyboard makes you move around
 					//cout << "Else After " << plantFileIndex << endl;
 					plantFileIndex = 0;
 				}
-			} */
+			
+			}
+			*/
 			//cout << filename << endl;
 			//cout << px << endl;
 			//cout << py << endl; 
@@ -217,7 +218,6 @@ class Player:public Sprite { // keyboard makes you move around
 	{
 		watering = new Sprite(renderer,"img/watercan.bmp",px,py);
 		waterstuff.push_back(watering);
-		waterTrigger = true;
 		//plants.pop_back(watering);
 		Mix_Music *plant = Mix_LoadMUS("img/water.wav");
 		if(Mix_PlayMusic(plant, 1) == -1)
@@ -231,12 +231,12 @@ class Player:public Sprite { // keyboard makes you move around
 			{
 				if(plants[i]->isFullyGrown() == true){
 					plants[i]->setWatered(true);
-					//cout << "FULLYGROWN" << endl;
+					cout << "FULLYGROWN" << endl;
 					HoldingPrice = plants[i]->getPrice();
 					cout << "HoldingPrice Before Depositing " << HoldingPrice << endl;
 					plants.erase(plants.begin()+i);
 				}else{
-					//cout << "NOT FULLYGROWN" << endl;
+					cout << "NOT FULLYGROWN" << endl;
 					plants[i]->setWatered(true);
 					plantWaterTrigger = true;
 				}
