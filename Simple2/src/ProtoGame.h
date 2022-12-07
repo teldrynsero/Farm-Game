@@ -1,6 +1,6 @@
 #pragma once
 
-string textname = "Space Game";
+string textname = "Space Farm";
 
 class ProtoGame {
 	SDL_Window *win;
@@ -43,7 +43,7 @@ class ProtoGame {
 		texW = 0;
 		texH = 0;
 		SDL_QueryTexture(texture, NULL, NULL, &texW, &texH);
-		dstrect = {300, 50, texW, texH};
+		dstrect = {250, 550, texW, texH};
 
 		// Setup Dear ImGui context
 		IMGUI_CHECKVERSION();

@@ -1,5 +1,7 @@
 #pragma once
 
+bool npc_talk = false;
+
 vector<Sprite *> waterstuff;
 Sprite *watering;
 
@@ -15,7 +17,8 @@ class Player:public Sprite { // keyboard makes you move around
 	string filenamePlant = "img/player_";
 	int StageNum = 1;
 	int pricePlant = 0;
-	int PlayerWallet = 0;
+	//start out with 9000 money
+	int PlayerWallet = 9000;
 	int HoldingPrice;
 
 	//public:
@@ -35,6 +38,8 @@ class Player:public Sprite { // keyboard makes you move around
 	void handleEvent(const SDL_Event &e) {
 		// is the event a A keypress
 		if (e.type==SDL_KEYDOWN) {
+			//cout << px << endl;
+			//cout << py << endl;
 			if (e.key.keysym.sym==SDLK_a)
 			{
 				px--;
@@ -111,6 +116,14 @@ class Player:public Sprite { // keyboard makes you move around
 					PlayerWatering(35+28-1, 51);
 				}
 			}
+			if (e.key.keysym.sym==SDLK_t)
+			{
+				if(px >= 185 && px <= 350 && py >= 100 && py <= 125)
+				{
+					//cout << "Glup Shitto NPC will talk here." << endl;
+					npc_talk = true;
+				}
+			}
 			/* if (e.key.keysym.sym==SDLK_f)
 			{
 				//std::cout << "Before " << plantFileIndex << " Space " << plantIndex;
@@ -170,6 +183,7 @@ class Player:public Sprite { // keyboard makes you move around
 				//cout << filenamePlant << endl;
 				//cout << StageNum << endl;
 				//cout << pricePlant << endl;
+				PlayerWallet -= pricePlant;
 				newplant = new Plant(renderer,filenamePlant,StageNum,1000,px+horizontal,py+vertical, pricePlant);
 				plants.push_back(newplant);
 				plantTrigger = true;
@@ -201,6 +215,7 @@ class Player:public Sprite { // keyboard makes you move around
 					//cout << filenamePlant << endl;
 					//cout << StageNum << endl;
 					//cout << pricePlant << endl;
+					PlayerWallet -= pricePlant;
 					newplant = new Plant(renderer,filenamePlant,StageNum,1000,px+horizontal,py+vertical, pricePlant);
 					plants.push_back(newplant);
 					plantTrigger = true;
