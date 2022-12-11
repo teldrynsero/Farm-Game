@@ -43,29 +43,29 @@ class Player:public Sprite { // keyboard makes you move around
 			if (e.key.keysym.sym==SDLK_a)
 			{
 				px--;
-				filename = "img/player_2.bmp";
-				image=mm.read(renderer,filename,SrcR,0,0,70,110);
+				filename = "img/spritesheet.bmp";
+				image=mm.read(renderer,filename,SrcR,140,0,70,110);
 				facingPosition = "Left";
 			}
 			if (e.key.keysym.sym==SDLK_w)
 			{
 				py--;
-				filename = "img/player_1.bmp";
-				image=mm.read(renderer,filename,SrcR,0,0,70,110);
+				filename = "img/spritesheet.bmp";
+				image=mm.read(renderer,filename,SrcR,70,0,70,110);
 				facingPosition = "Up";
 			}
 			if (e.key.keysym.sym==SDLK_s)
 			{
 				py++;
-				filename = "img/player_0.bmp";
+				filename = "img/spritesheet.bmp";
 				image=mm.read(renderer,filename,SrcR,0,0,70,110);
 				facingPosition = "Down";
 			}
 			if (e.key.keysym.sym==SDLK_d)
 			{
 				px++;
-				filename = "img/player_3.bmp";
-				image=mm.read(renderer,filename,SrcR,0,0,70,110);
+				filename = "img/spritesheet.bmp";
+				image=mm.read(renderer,filename,SrcR,210,0,70,110);
 				facingPosition = "Right";
 			}
 			if (e.key.keysym.sym==SDLK_e)
