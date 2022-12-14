@@ -20,6 +20,7 @@
 #include "Plant.h"
 #include "Player.h"
 #include "Particle.h"
+#include "StartScreen.h"
 
 using namespace std;
 
@@ -39,6 +40,9 @@ class Game:public ProtoGame {
 	Sprite *ground;
 	Sprite *npc;
 	Sprite *start;
+	Button *startButton;
+	// Sprite *startButton;
+	Sprite *startScreen;
 	SDL_Event firstEvent;
 	//int SDL_WaitEvent(SDL_Event * event);
 	//Sprite *sellchest;
@@ -60,8 +64,20 @@ class Game:public ProtoGame {
 				exit(0);
    		}
 		*/ 
+
+	// Show start button over starting screen -> if user presses start it changes screen to game
+		startScreen = new Sprite(renderer, "img/startscreen.bmp");
+		sprites.push_back(startScreen);
+		startButton = new Button(renderer, "img/startbutton.bmp", 100, 150, 50, 100);
+		sprites.push_back(startButton);
+		if (startButton->isClicked == true){  
+			background = new Sprite(renderer, "img/morning_0.bmp");
+			sprites.push_back(background);
+		}
+
 		background = new Sprite(renderer, "img/morning_0.bmp");
 		sprites.push_back(background);
+		
 		sprites.push_back(new Animation(renderer,"img/morning_",7,1000,0,0));
 		ground = new Sprite(renderer, "img/ground.bmp");
 		sprites.push_back(ground);
@@ -69,7 +85,7 @@ class Game:public ProtoGame {
 		//sellchest = new Sprite(renderer, "sellchest.bmp", (640-(70/2)), (152-(55/2)));
 		//double sx=getW()/2.0;
 		//double sy=getH()/2.0;
-		for (int i=0;i<10;i++) { //  Initialize Level loop
+		for (int i=0;i<20;i++) { //  Initialize Level loop
 		  //double x=sx;
 		  //double y=sy;
 		  double vx=100.0*(1.0-(double)(rand()%2000)/1000.0);
